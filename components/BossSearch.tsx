@@ -14,13 +14,27 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   // Sync external value changes (e.g. when editor is reset)
   useEffect(() => {
     setQuery(value);
   }, [value]);
+
+  // Reset keyboard selection when the result list changes
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [results]);
+
+  // Scroll the highlighted item into view when navigating by keyboard
+  useEffect(() => {
+    if (activeIndex < 0 || !listRef.current) return;
+    const item = listRef.current.children[activeIndex] as HTMLElement | undefined;
+    item?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -58,10 +72,36 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
     }, 300);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open || results.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setActiveIndex((i) => Math.min(i + 1, results.length - 1));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActiveIndex((i) => Math.max(i - 1, 0));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (activeIndex >= 0 && activeIndex < results.length) {
+          void handleSelect(results[activeIndex]);
+        }
+        break;
+      case "Escape":
+        setOpen(false);
+        setActiveIndex(-1);
+        break;
+    }
+  }
+
   async function handleSelect(name: string) {
     setQuery(name);
     setOpen(false);
     setResults([]);
+    setActiveIndex(-1);
     setFetchingImage(true);
     try {
       const response = await fetch(`/api/bosses/image?name=${encodeURIComponent(name)}`);
@@ -83,10 +123,13 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
           placeholder="Search boss name..."
           value={query}
           onChange={(e) => handleChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           onFocus={() => {
             if (results.length > 0) setOpen(true);
           }}
           autoComplete="off"
+          aria-autocomplete="list"
+          aria-expanded={open && results.length > 0}
         />
         {(loading || fetchingImage) && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-osrs-text-muted text-xs">
@@ -96,9 +139,18 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
       </div>
 
       {open && results.length > 0 && (
-        <ul className="absolute z-50 mt-1 w-full rounded border border-osrs-border bg-osrs-panel shadow-lg">
-          {results.map((name) => (
-            <BossResultItem key={name} name={name} onSelect={handleSelect} />
+        <ul
+          ref={listRef}
+          className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto rounded border border-osrs-border bg-osrs-panel shadow-lg"
+        >
+          {results.map((name, index) => (
+            <BossResultItem
+              key={name}
+              name={name}
+              active={index === activeIndex}
+              onSelect={handleSelect}
+              onHover={() => setActiveIndex(index)}
+            />
           ))}
         </ul>
       )}
@@ -108,15 +160,18 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
 
 function BossResultItem({
   name,
+  active,
   onSelect,
+  onHover,
 }: {
   name: string;
+  active: boolean;
   onSelect: (name: string) => void;
+  onHover: () => void;
 }) {
   const [imgSrc, setImgSrc] = useState<string | null>(null);
 
-  // Pre-fetch the thumbnail on hover for a snappier feel
-  async function handleMouseEnter() {
+  async function prefetchImage() {
     if (imgSrc !== null) return;
     try {
       const response = await fetch(`/api/bosses/image?name=${encodeURIComponent(name)}`);
@@ -131,8 +186,13 @@ function BossResultItem({
     <li>
       <button
         type="button"
-        className="flex w-full items-center gap-3 px-3 py-2 text-left text-osrs-text hover:bg-osrs-panel-dark"
-        onMouseEnter={() => void handleMouseEnter()}
+        className={`flex w-full items-center gap-3 px-3 py-2 text-left text-osrs-text transition-colors ${
+          active ? "bg-osrs-button" : "hover:bg-osrs-panel-dark"
+        }`}
+        onMouseEnter={() => {
+          onHover();
+          void prefetchImage();
+        }}
         onClick={() => onSelect(name)}
       >
         <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded border border-osrs-border bg-osrs-panel-dark">
