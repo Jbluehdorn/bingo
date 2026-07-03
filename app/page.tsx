@@ -71,15 +71,7 @@ export default async function HomePage() {
       {orderedTeams.length === 2 && progress.length > 0 ? (
         <div className="grid gap-6 xl:grid-cols-2">
           {orderedTeams.map((team, index) => (
-            <div key={team.id} className="flex flex-col gap-4">
-              <BingoBoard tiles={progress} team={team} teamIndex={index as 0 | 1} />
-              <Link
-                href={`/log-drop?team=${team.id}`}
-                className="osrs-button inline-flex justify-center"
-              >
-                Log a Drop for {team.name}
-              </Link>
-            </div>
+            <BingoBoard key={team.id} tiles={progress} team={team} teamIndex={index as 0 | 1} />
           ))}
         </div>
       ) : (

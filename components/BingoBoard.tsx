@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { getTileImageUrl, resolveStoredImageUrl } from "@/lib/images";
+import { parseTileAcceptedDrops } from "@/lib/types";
 import type { Team, TileWithProgress } from "@/lib/types";
 
 interface BingoBoardProps {
@@ -29,10 +31,11 @@ function BoardMiniTile({
 }) {
   const initialSrc = useMemo(() => resolveStoredImageUrl(getTileImageUrl(tile)), [tile]);
   const [imageSrc, setImageSrc] = useState(initialSrc);
+  const acceptedDrops = useMemo(() => parseTileAcceptedDrops(tile), [tile]);
 
   return (
     <div
-      className={`flex min-h-34 flex-col gap-2 rounded border p-2 ${
+      className={`group relative flex min-h-34 flex-col gap-2 rounded border p-2 ${
         isComplete
           ? "border-osrs-green-border bg-osrs-green/80"
           : "border-osrs-red-border bg-osrs-red/70"
@@ -65,6 +68,18 @@ function BoardMiniTile({
           </span>
         ) : null}
       </div>
+
+      {/* Accepted drops tooltip — only shown for drop tiles with configured drops */}
+      {tile.type === "drop" && acceptedDrops.length > 0 && (
+        <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded border border-osrs-border bg-osrs-panel p-2 text-xs opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
+          <div className="mb-1.5 font-semibold text-osrs-text-bright">Accepted Drops</div>
+          <ul className="flex flex-col gap-0.5">
+            {acceptedDrops.map((drop) => (
+              <li key={drop} className="text-osrs-text">• {drop}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
@@ -76,7 +91,7 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
   return (
     <section className="osrs-panel flex flex-col gap-4 p-4">
       <div className="flex items-center gap-4">
-        <div className="relative h-16 w-16 overflow-hidden rounded border-2 border-osrs-border bg-osrs-panel-dark">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded border-2 border-osrs-border bg-osrs-panel-dark">
           {team.photo_url ? (
             <Image
               src={resolveStoredImageUrl(team.photo_url)}
@@ -90,9 +105,17 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
             <div className="flex h-full items-center justify-center text-2xl">🛡️</div>
           )}
         </div>
-        <div>
-          <h2 className="text-2xl">{team.name}</h2>
-          <p className="text-sm text-osrs-text-muted">{completeCount}/25 tiles complete</p>
+        <div className="flex flex-1 items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl">{team.name}</h2>
+            <p className="text-sm text-osrs-text-muted">{completeCount}/25 tiles complete</p>
+          </div>
+          <Link
+            href={`/log-drop?team=${team.id}`}
+            className="osrs-button shrink-0 text-sm"
+          >
+            Log a Drop
+          </Link>
         </div>
       </div>
 
