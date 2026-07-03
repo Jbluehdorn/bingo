@@ -13,7 +13,7 @@ import type {
   TileType,
   TileWithProgress,
 } from "@/lib/types";
-import { OSRS_SKILLS } from "@/lib/types";
+import { OSRS_SKILLS, parseTileAcceptedDrops } from "@/lib/types";
 
 interface GamePayload {
   game: Game;
@@ -30,6 +30,7 @@ interface TileEditorState {
   type: TileType;
   boss_name: string;
   required_drops: number;
+  accepted_drops: string[];
   skill_name: string;
   required_xp: number;
   image_url: string;
@@ -41,6 +42,7 @@ const emptyTileForm = {
   type: "drop" as TileType,
   boss_name: "",
   required_drops: 1,
+  accepted_drops: [],
   skill_name: "attack",
   required_xp: 100000,
   image_url: "",
@@ -51,6 +53,8 @@ export default function AdminPage() {
   const [progressTiles, setProgressTiles] = useState<TileWithProgress[]>([]);
   const [dropRows, setDropRows] = useState<DropSubmissionWithDetails[]>([]);
   const [tileEditor, setTileEditor] = useState<TileEditorState>(emptyTileForm);
+  const [fetchingDrops, setFetchingDrops] = useState(false);
+  const [newDropInput, setNewDropInput] = useState("");
   const [teamNames, setTeamNames] = useState<Record<number, string>>({});
   const [newPlayers, setNewPlayers] = useState<Record<number, string>>({});
   const [petTeamId, setPetTeamId] = useState(1);
@@ -148,14 +152,42 @@ export default function AdminPage() {
         type: existing.type,
         boss_name: existing.boss_name ?? "",
         required_drops: existing.required_drops ?? 1,
+        accepted_drops: parseTileAcceptedDrops(existing),
         skill_name: existing.skill_name ?? "attack",
         required_xp: existing.required_xp ?? 100000,
         image_url: existing.image_url ?? "",
       });
       return;
     }
-
     setTileEditor({ ...emptyTileForm, position, id: 0 });
+  }
+
+  async function fetchBossDrops(bossName: string) {
+    if (!bossName.trim()) return;
+    setFetchingDrops(true);
+    try {
+      const response = await fetch(`/api/bosses/drops?name=${encodeURIComponent(bossName)}`);
+      const data = (await response.json()) as { drops?: string[] };
+      setTileEditor((current) => ({ ...current, accepted_drops: data.drops ?? [] }));
+    } catch {
+      // silently fail — user can add drops manually
+    } finally {
+      setFetchingDrops(false);
+    }
+  }
+
+  function addAcceptedDrop() {
+    const drop = newDropInput.trim();
+    if (!drop || tileEditor.accepted_drops.includes(drop)) return;
+    setTileEditor((current) => ({ ...current, accepted_drops: [...current.accepted_drops, drop] }));
+    setNewDropInput("");
+  }
+
+  function removeAcceptedDrop(drop: string) {
+    setTileEditor((current) => ({
+      ...current,
+      accepted_drops: current.accepted_drops.filter((d) => d !== drop),
+    }));
   }
 
   async function runAction(action: () => Promise<void>) {
@@ -255,6 +287,7 @@ export default function AdminPage() {
         type: tileEditor.type,
         boss_name: tileEditor.type === "drop" ? tileEditor.boss_name.trim() : null,
         required_drops: tileEditor.type === "drop" ? Number(tileEditor.required_drops) : null,
+        accepted_drops: tileEditor.type === "drop" ? JSON.stringify(tileEditor.accepted_drops) : null,
         skill_name: tileEditor.type === "xp" ? tileEditor.skill_name : null,
         required_xp: tileEditor.type === "xp" ? Number(tileEditor.required_xp) : null,
         image_url: tileEditor.image_url.trim() || null,
@@ -443,22 +476,81 @@ export default function AdminPage() {
             {tileEditor.type === "drop" ? (
               <>
                 <div className="flex flex-col gap-2">
-                  <span className="font-semibold">Boss Name</span>
+                  <span className="font-semibold">Boss / Raid Name</span>
                   <BossSearch
                     value={tileEditor.boss_name}
-                    onSelect={(name, imageUrl) =>
+                    onSelect={(name, imageUrl) => {
                       setTileEditor((current) => ({
                         ...current,
                         boss_name: name,
                         image_url: imageUrl || current.image_url,
-                      }))
-                    }
+                      }));
+                      void fetchBossDrops(name);
+                    }}
                   />
                 </div>
                 <label className="flex flex-col gap-2">
                   <span className="font-semibold">Required Drops</span>
                   <input className="osrs-input" type="number" min={1} value={tileEditor.required_drops} onChange={(event) => setTileEditor((current) => ({ ...current, required_drops: Number(event.target.value) }))} />
                 </label>
+
+                <div className="flex flex-col gap-3 md:col-span-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">Accepted Drops</span>
+                    {tileEditor.boss_name && (
+                      <button
+                        type="button"
+                        className="text-xs text-osrs-text-muted hover:text-osrs-text disabled:opacity-50"
+                        onClick={() => void fetchBossDrops(tileEditor.boss_name)}
+                        disabled={fetchingDrops}
+                      >
+                        {fetchingDrops ? "Fetching…" : "↻ Re-fetch from Wiki"}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="min-h-[2.5rem] flex flex-wrap gap-2 rounded border border-osrs-border bg-osrs-panel-dark p-2">
+                    {fetchingDrops ? (
+                      <span className="text-sm text-osrs-text-muted">Fetching drops from wiki…</span>
+                    ) : tileEditor.accepted_drops.length ? (
+                      tileEditor.accepted_drops.map((drop) => (
+                        <span
+                          key={drop}
+                          className="flex items-center gap-1 rounded border border-osrs-border bg-osrs-panel px-2 py-1 text-sm"
+                        >
+                          {drop}
+                          <button
+                            type="button"
+                            aria-label={`Remove ${drop}`}
+                            className="ml-1 text-osrs-text-muted hover:text-red-400"
+                            onClick={() => removeAcceptedDrop(drop)}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-osrs-text-muted">
+                        No drops configured. Select a boss to auto-fetch, or add manually below.
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      className="osrs-input"
+                      placeholder="Add a custom drop…"
+                      value={newDropInput}
+                      onChange={(e) => setNewDropInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") { e.preventDefault(); addAcceptedDrop(); }
+                      }}
+                    />
+                    <button type="button" className="osrs-button shrink-0" onClick={addAcceptedDrop}>
+                      Add
+                    </button>
+                  </div>
+                </div>
               </>
             ) : (
               <>

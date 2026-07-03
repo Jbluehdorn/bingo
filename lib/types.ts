@@ -61,10 +61,20 @@ export interface Tile {
   type: TileType;
   boss_name: string | null;
   required_drops: number | null;
+  accepted_drops: string | null; // JSON-encoded string[]
   skill_name: string | null;
   required_xp: number | null;
   image_url: string | null;
   created_at: string;
+}
+
+export function parseTileAcceptedDrops(tile: Tile): string[] {
+  if (!tile.accepted_drops) return [];
+  try {
+    return JSON.parse(tile.accepted_drops) as string[];
+  } catch {
+    return [];
+  }
 }
 
 export interface DropSubmission {

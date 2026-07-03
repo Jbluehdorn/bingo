@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 
 import { getTileImageUrl, resolveStoredImageUrl } from "@/lib/images";
+import { parseTileAcceptedDrops } from "@/lib/types";
 import type { TeamTileProgress, Tile } from "@/lib/types";
 
 interface TileCardProps {
@@ -25,6 +26,7 @@ export default function TileCard({
 }: TileCardProps) {
   const initialImage = useMemo(() => resolveStoredImageUrl(getTileImageUrl(tile)), [tile]);
   const [imageSrc, setImageSrc] = useState(initialImage);
+  const acceptedDrops = useMemo(() => parseTileAcceptedDrops(tile), [tile]);
 
   const bgClass = team1Progress.is_complete && team2Progress.is_complete
     ? "bg-osrs-green border-osrs-green-border"
@@ -86,6 +88,21 @@ export default function TileCard({
       <div>
         <h3 className="truncate text-sm">{title ?? "Unconfigured tile"}</h3>
         <p className="text-xs text-osrs-text-muted">{goal}</p>
+        {tile.type === "drop" && acceptedDrops.length > 0 && (
+          <div className="relative mt-1 inline-block group">
+            <span className="cursor-help text-xs text-osrs-text-muted underline decoration-dotted">
+              {acceptedDrops.length} accepted drop{acceptedDrops.length !== 1 ? "s" : ""} ▾
+            </span>
+            <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-56 rounded border border-osrs-border bg-osrs-panel p-2 text-xs opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
+              <div className="mb-1.5 font-semibold text-osrs-text-bright">Accepted Drops</div>
+              <ul className="flex flex-col gap-0.5">
+                {acceptedDrops.map((drop) => (
+                  <li key={drop} className="text-osrs-text">• {drop}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-1">

@@ -8,6 +8,7 @@ function validateTilePayload(body: {
   type?: TileType;
   boss_name?: string | null;
   required_drops?: number | null;
+  accepted_drops?: string | null;
   skill_name?: string | null;
   required_xp?: number | null;
   image_url?: string | null;
@@ -31,6 +32,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
       type?: TileType;
       boss_name?: string | null;
       required_drops?: number | null;
+      accepted_drops?: string | null;
       skill_name?: string | null;
       required_xp?: number | null;
       image_url?: string | null;
@@ -42,13 +44,14 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const env = await getEnv();
     await env.DB.prepare(`
       UPDATE tiles
-      SET position = ?, type = ?, boss_name = ?, required_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
+      SET position = ?, type = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
       WHERE id = ?
     `).bind(
       Number(body.position),
       body.type,
       body.type === "drop" ? body.boss_name?.trim() ?? null : null,
       body.type === "drop" ? Number(body.required_drops) : null,
+      body.type === "drop" ? (body.accepted_drops ?? null) : null,
       body.type === "xp" ? body.skill_name?.trim().toLowerCase() ?? null : null,
       body.type === "xp" ? Number(body.required_xp) : null,
       body.image_url?.trim() ?? null,

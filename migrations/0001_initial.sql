@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS tiles (
   type TEXT NOT NULL CHECK(type IN ('drop', 'xp')),
   boss_name TEXT,
   required_drops INTEGER,
+  accepted_drops TEXT,
   skill_name TEXT,
   required_xp INTEGER,
   image_url TEXT,
