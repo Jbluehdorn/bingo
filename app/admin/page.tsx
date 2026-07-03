@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
+import BossSearch from "@/components/BossSearch";
 import { resolveStoredImageUrl } from "@/lib/images";
 import type {
   DropSubmissionWithDetails,
@@ -441,10 +442,19 @@ export default function AdminPage() {
 
             {tileEditor.type === "drop" ? (
               <>
-                <label className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
                   <span className="font-semibold">Boss Name</span>
-                  <input className="osrs-input" value={tileEditor.boss_name} onChange={(event) => setTileEditor((current) => ({ ...current, boss_name: event.target.value }))} />
-                </label>
+                  <BossSearch
+                    value={tileEditor.boss_name}
+                    onSelect={(name, imageUrl) =>
+                      setTileEditor((current) => ({
+                        ...current,
+                        boss_name: name,
+                        image_url: imageUrl || current.image_url,
+                      }))
+                    }
+                  />
+                </div>
                 <label className="flex flex-col gap-2">
                   <span className="font-semibold">Required Drops</span>
                   <input className="osrs-input" type="number" min={1} value={tileEditor.required_drops} onChange={(event) => setTileEditor((current) => ({ ...current, required_drops: Number(event.target.value) }))} />
