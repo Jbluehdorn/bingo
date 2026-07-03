@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getTileImageUrl, resolveStoredImageUrl } from "@/lib/images";
-import { parseTileAcceptedDrops } from "@/lib/types";
+import { getTileDisplayName, parseTileAcceptedDrops } from "@/lib/types";
 import type { Team, TileWithProgress } from "@/lib/types";
 
 interface BingoBoardProps {
@@ -46,7 +46,7 @@ function BoardMiniTile({
         {imageSrc ? (
           <Image
             src={imageSrc}
-            alt={tile.type === "drop" ? tile.boss_name ?? "Boss" : tile.skill_name ?? "Skill"}
+            alt={getTileDisplayName(tile)}
             fill
             sizes="96px"
             className="object-contain p-1"
@@ -59,7 +59,7 @@ function BoardMiniTile({
       </div>
       <div className="min-h-10">
         <div className="line-clamp-2 text-xs font-semibold text-osrs-text-bright">
-          {tile.type === "drop" ? tile.boss_name : tile.skill_name}
+          {getTileDisplayName(tile)}
         </div>
         <div className="text-[11px] text-osrs-text">{progressText}</div>
         {petCompleted ? (

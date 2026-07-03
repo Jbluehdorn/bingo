@@ -7,6 +7,7 @@ import type { TileType } from "@/lib/types";
 function validateTilePayload(body: {
   position?: number;
   type?: TileType;
+  display_title?: string | null;
   boss_name?: string | null;
   required_drops?: number | null;
   accepted_drops?: string | null;
@@ -24,7 +25,9 @@ function validateTilePayload(body: {
   }
 
   if (body.type === "drop") {
-    if (!body.boss_name?.trim()) return "Boss name is required for drop tiles.";
+    // Either a boss name OR a display title is required (freeform tiles use display_title instead of boss_name)
+    const hasIdentifier = body.boss_name?.trim() || body.display_title?.trim();
+    if (!hasIdentifier) return "Drop tiles need a boss name or display title.";
     if (!Number(body.required_drops) || Number(body.required_drops) < 1) return "Required drops must be at least 1.";
   }
 
@@ -53,6 +56,7 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       position?: number;
       type?: TileType;
+      display_title?: string | null;
       boss_name?: string | null;
       required_drops?: number | null;
       accepted_drops?: string | null;
@@ -70,10 +74,11 @@ export async function POST(request: Request) {
     if (existing) {
       await env.DB.prepare(`
         UPDATE tiles
-        SET type = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
+        SET type = ?, display_title = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
         WHERE id = ?
       `).bind(
         body.type,
+        body.display_title?.trim() ?? null,
         body.type === "drop" ? body.boss_name?.trim() ?? null : null,
         body.type === "drop" ? Number(body.required_drops) : null,
         body.type === "drop" ? (body.accepted_drops ?? null) : null,
@@ -86,11 +91,12 @@ export async function POST(request: Request) {
     }
 
     await env.DB.prepare(`
-      INSERT INTO tiles (position, type, boss_name, required_drops, accepted_drops, skill_name, required_xp, image_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tiles (position, type, display_title, boss_name, required_drops, accepted_drops, skill_name, required_xp, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       Number(body.position),
       body.type,
+      body.display_title?.trim() ?? null,
       body.type === "drop" ? body.boss_name?.trim() ?? null : null,
       body.type === "drop" ? Number(body.required_drops) : null,
       body.type === "drop" ? (body.accepted_drops ?? null) : null,

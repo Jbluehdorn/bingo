@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS tiles (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   position INTEGER NOT NULL UNIQUE CHECK(position >= 1 AND position <= 25),
   type TEXT NOT NULL CHECK(type IN ('drop', 'xp')),
+  display_title TEXT,
   boss_name TEXT,
   required_drops INTEGER,
   accepted_drops TEXT,

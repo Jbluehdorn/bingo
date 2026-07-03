@@ -1,80 +1,82 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+
+import type { BossEntry } from "@/lib/types";
+import bossData from "@/data/bosses.json";
+
+const BOSSES = bossData as BossEntry[];
+
+function searchBosses(query: string): BossEntry[] {
+  const q = query.toLowerCase().trim();
+  if (!q) return [];
+
+  const results: BossEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const boss of BOSSES) {
+    if (seen.has(boss.id)) continue;
+    const nameMatch = boss.name.toLowerCase().includes(q);
+    const titleMatch = boss.title.toLowerCase().includes(q);
+    const groupMatch = boss.group?.toLowerCase().includes(q) ?? false;
+    if (nameMatch || titleMatch || groupMatch) {
+      results.push(boss);
+      seen.add(boss.id);
+    }
+  }
+  return results;
+}
 
 interface BossSearchProps {
   value: string;
-  onSelect: (name: string, imageUrl: string) => void;
+  onSelect: (boss: BossEntry) => void;
 }
 
 export default function BossSearch({ value, onSelect }: BossSearchProps) {
   const [query, setQuery] = useState(value);
-  const [results, setResults] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [fetchingImage, setFetchingImage] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+
+  const results = useMemo(() => searchBosses(query), [query]);
 
   // Sync external value changes (e.g. when editor is reset)
   useEffect(() => {
     setQuery(value);
   }, [value]);
 
-  // Reset keyboard selection when the result list changes
+  // Reset keyboard selection when results change
   useEffect(() => {
     setActiveIndex(-1);
   }, [results]);
 
-  // Scroll the highlighted item into view when navigating by keyboard
+  // Scroll highlighted item into view
   useEffect(() => {
     if (activeIndex < 0 || !listRef.current) return;
     const item = listRef.current.children[activeIndex] as HTMLElement | undefined;
     item?.scrollIntoView({ block: "nearest" });
   }, [activeIndex]);
 
-  // Close dropdown on outside click
+  // Close on outside click
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClick(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   function handleChange(newQuery: string) {
     setQuery(newQuery);
     setOpen(true);
-
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    if (newQuery.trim().length < 2) {
-      setResults([]);
-      return;
-    }
-
-    debounceRef.current = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/bosses/search?q=${encodeURIComponent(newQuery.trim())}`);
-        const data = (await response.json()) as { results?: string[] };
-        setResults(data.results ?? []);
-      } catch {
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (!open || results.length === 0) return;
-
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
@@ -87,7 +89,7 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
       case "Enter":
         e.preventDefault();
         if (activeIndex >= 0 && activeIndex < results.length) {
-          void handleSelect(results[activeIndex]);
+          handleSelect(results[activeIndex]);
         }
         break;
       case "Escape":
@@ -97,60 +99,85 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
     }
   }
 
-  async function handleSelect(name: string) {
-    setQuery(name);
+  function handleSelect(boss: BossEntry) {
+    setQuery(boss.name);
     setOpen(false);
-    setResults([]);
     setActiveIndex(-1);
-    setFetchingImage(true);
-    try {
-      const response = await fetch(`/api/bosses/image?name=${encodeURIComponent(name)}`);
-      const data = (await response.json()) as { imageUrl?: string | null };
-      onSelect(name, data.imageUrl ?? "");
-    } catch {
-      onSelect(name, "");
-    } finally {
-      setFetchingImage(false);
-    }
+    onSelect(boss);
   }
+
+  // Group results for display
+  const grouped = useMemo(() => {
+    const map = new Map<string, BossEntry[]>();
+    for (const boss of results) {
+      const key = boss.group ?? "Other";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(boss);
+    }
+    return map;
+  }, [results]);
 
   return (
     <div ref={containerRef} className="relative">
-      <div className="relative">
-        <input
-          className="osrs-input"
-          type="text"
-          placeholder="Search boss name..."
-          value={query}
-          onChange={(e) => handleChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => {
-            if (results.length > 0) setOpen(true);
-          }}
-          autoComplete="off"
-          aria-autocomplete="list"
-          aria-expanded={open && results.length > 0}
-        />
-        {(loading || fetchingImage) && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-osrs-text-muted text-xs">
-            {fetchingImage ? "Loading image…" : "Searching…"}
-          </span>
-        )}
-      </div>
+      <input
+        className="osrs-input"
+        type="text"
+        placeholder="Search boss or group (e.g. God Wars Dungeon)…"
+        value={query}
+        onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onFocus={() => { if (results.length > 0) setOpen(true); }}
+        autoComplete="off"
+        aria-autocomplete="list"
+        aria-expanded={open && results.length > 0}
+      />
 
       {open && results.length > 0 && (
         <ul
           ref={listRef}
-          className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto rounded border border-osrs-border bg-osrs-panel shadow-lg"
+          className="absolute z-50 mt-1 max-h-72 w-full overflow-y-auto rounded border border-osrs-border bg-osrs-panel shadow-lg"
         >
-          {results.map((name, index) => (
-            <BossResultItem
-              key={name}
-              name={name}
-              active={index === activeIndex}
-              onSelect={handleSelect}
-              onHover={() => setActiveIndex(index)}
-            />
+          {[...grouped.entries()].map(([groupName, bosses]) => (
+            <li key={groupName}>
+              {grouped.size > 1 || bosses[0].group !== null ? (
+                <div className="sticky top-0 bg-osrs-panel-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-osrs-text-muted">
+                  {groupName}
+                </div>
+              ) : null}
+              {bosses.map((boss) => {
+                const flatIndex = results.indexOf(boss);
+                return (
+                  <button
+                    key={boss.id}
+                    type="button"
+                    className={`flex w-full items-center gap-3 px-3 py-2 text-left text-osrs-text transition-colors ${
+                      flatIndex === activeIndex ? "bg-osrs-button" : "hover:bg-osrs-panel-dark"
+                    }`}
+                    onMouseEnter={() => setActiveIndex(flatIndex)}
+                    onClick={() => handleSelect(boss)}
+                  >
+                    <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded border border-osrs-border bg-osrs-panel-dark">
+                      {boss.imageUrl ? (
+                        <Image
+                          src={boss.imageUrl}
+                          alt={boss.name}
+                          fill
+                          sizes="36px"
+                          className="object-contain p-0.5"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-base">⚔️</div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold">{boss.name}</div>
+                      <div className="truncate text-xs text-osrs-text-muted">{boss.title}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </li>
           ))}
         </ul>
       )}
@@ -158,59 +185,3 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
   );
 }
 
-function BossResultItem({
-  name,
-  active,
-  onSelect,
-  onHover,
-}: {
-  name: string;
-  active: boolean;
-  onSelect: (name: string) => void;
-  onHover: () => void;
-}) {
-  const [imgSrc, setImgSrc] = useState<string | null>(null);
-
-  async function prefetchImage() {
-    if (imgSrc !== null) return;
-    try {
-      const response = await fetch(`/api/bosses/image?name=${encodeURIComponent(name)}`);
-      const data = (await response.json()) as { imageUrl?: string | null };
-      setImgSrc(data.imageUrl ?? "");
-    } catch {
-      setImgSrc("");
-    }
-  }
-
-  return (
-    <li>
-      <button
-        type="button"
-        className={`flex w-full items-center gap-3 px-3 py-2 text-left text-osrs-text transition-colors ${
-          active ? "bg-osrs-button" : "hover:bg-osrs-panel-dark"
-        }`}
-        onMouseEnter={() => {
-          onHover();
-          void prefetchImage();
-        }}
-        onClick={() => onSelect(name)}
-      >
-        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded border border-osrs-border bg-osrs-panel-dark">
-          {imgSrc ? (
-            <Image
-              src={imgSrc}
-              alt={name}
-              fill
-              sizes="40px"
-              className="object-contain p-0.5"
-              unoptimized
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-lg">⚔️</div>
-          )}
-        </div>
-        <span className="truncate font-semibold">{name}</span>
-      </button>
-    </li>
-  );
-}

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 
 import { getTileImageUrl, resolveStoredImageUrl } from "@/lib/images";
-import { parseTileAcceptedDrops } from "@/lib/types";
+import { getTileDisplayName, parseTileAcceptedDrops } from "@/lib/types";
 import type { TeamTileProgress, Tile } from "@/lib/types";
 
 interface TileCardProps {
@@ -34,7 +34,7 @@ export default function TileCard({
       ? "bg-osrs-red border-osrs-red-border"
       : "border-yellow-700 bg-yellow-950/60";
 
-  const title = tile.type === "drop" ? tile.boss_name : tile.skill_name;
+  const title = getTileDisplayName(tile);
   const goal = tile.type === "drop"
     ? `${tile.required_drops ?? 0} uniques`
     : `${formatValue(tile.required_xp ?? 0)} XP`;
@@ -86,7 +86,7 @@ export default function TileCard({
       </div>
 
       <div>
-        <h3 className="truncate text-sm">{title ?? "Unconfigured tile"}</h3>
+        <h3 className="truncate text-sm">{title}</h3>
         <p className="text-xs text-osrs-text-muted">{goal}</p>
         {tile.type === "drop" && acceptedDrops.length > 0 && (
           <div className="relative mt-1 inline-block group">

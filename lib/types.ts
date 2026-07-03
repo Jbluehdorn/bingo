@@ -59,6 +59,7 @@ export interface Tile {
   id: number;
   position: number;
   type: TileType;
+  display_title: string | null;
   boss_name: string | null;
   required_drops: number | null;
   accepted_drops: string | null; // JSON-encoded string[]
@@ -75,6 +76,22 @@ export function parseTileAcceptedDrops(tile: Tile): string[] {
   } catch {
     return [];
   }
+}
+
+/** Effective display name for a tile — respects custom display_title */
+export function getTileDisplayName(tile: Tile): string {
+  if (tile.display_title) return tile.display_title;
+  if (tile.type === "drop") return tile.boss_name ?? "Unconfigured tile";
+  return tile.skill_name ?? "Unconfigured tile";
+}
+
+export interface BossEntry {
+  id: string;
+  name: string;
+  title: string;
+  group: string | null;
+  imageUrl: string | null;
+  drops: string[];
 }
 
 export interface DropSubmission {

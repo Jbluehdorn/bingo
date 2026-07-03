@@ -1,0 +1,917 @@
+[
+  {
+    "id": "ahrim",
+    "name": "Ahrim the Blighted",
+    "title": "Barrows — Ahrim",
+    "group": "Barrows",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Ahrim_the_Blighted.png/200px-Ahrim_the_Blighted.png?33092",
+    "drops": [
+      "Ahrim's hood",
+      "Ahrim's robetop",
+      "Ahrim's robeskirt",
+      "Ahrim's staff",
+      "Bolt rack"
+    ]
+  },
+  {
+    "id": "dharok",
+    "name": "Dharok the Wretched",
+    "title": "Barrows — Dharok",
+    "group": "Barrows",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dharok_the_Wretched.png/200px-Dharok_the_Wretched.png?33092",
+    "drops": [
+      "Dharok's helm",
+      "Dharok's platebody",
+      "Dharok's platelegs",
+      "Dharok's greataxe",
+      "Bolt rack"
+    ]
+  },
+  {
+    "id": "guthan",
+    "name": "Guthan the Infested",
+    "title": "Barrows — Guthan",
+    "group": "Barrows",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Guthan_the_Infested.png/200px-Guthan_the_Infested.png?33092",
+    "drops": [
+      "Guthan's helm",
+      "Guthan's platebody",
+      "Guthan's chainskirt",
+      "Guthan's warspear",
+      "Bolt rack"
+    ]
+  },
+  {
+    "id": "karil",
+    "name": "Karil the Tainted",
+    "title": "Barrows — Karil",
+    "group": "Barrows",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Karil_the_Tainted.png/200px-Karil_the_Tainted.png?33092",
+    "drops": [
+      "Karil's coif",
+      "Karil's leathertop",
+      "Karil's leatherskirt",
+      "Karil's crossbow",
+      "Bolt rack"
+    ]
+  },
+  {
+    "id": "torag",
+    "name": "Torag the Corrupted",
+    "title": "Barrows — Torag",
+    "group": "Barrows",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Torag_the_Corrupted.png/200px-Torag_the_Corrupted.png?33092",
+    "drops": [
+      "Torag's helm",
+      "Torag's platebody",
+      "Torag's platelegs",
+      "Torag's hammers",
+      "Bolt rack"
+    ]
+  },
+  {
+    "id": "verac",
+    "name": "Verac the Defiled",
+    "title": "Barrows — Verac",
+    "group": "Barrows",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Verac_the_Defiled.png/200px-Verac_the_Defiled.png?33092",
+    "drops": [
+      "Verac's helm",
+      "Verac's brassard",
+      "Verac's plateskirt",
+      "Verac's flail",
+      "Bolt rack"
+    ]
+  },
+  {
+    "id": "kreearra",
+    "name": "Kree'arra",
+    "title": "GWD — Kree'arra (Armadyl)",
+    "group": "God Wars Dungeon",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Kree%27arra.png/200px-Kree%27arra.png?ba75c",
+    "drops": [
+      "Pet kree'arra",
+      "Armadyl helmet",
+      "Armadyl chestplate",
+      "Armadyl chainskirt",
+      "Armadyl hilt",
+      "Godsword shard 1",
+      "Godsword shard 2",
+      "Godsword shard 3"
+    ]
+  },
+  {
+    "id": "zilyana",
+    "name": "Commander Zilyana",
+    "title": "GWD — Zilyana (Saradomin)",
+    "group": "God Wars Dungeon",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Commander_Zilyana.png/200px-Commander_Zilyana.png?c5eaa",
+    "drops": [
+      "Pet zilyana",
+      "Armadyl crossbow",
+      "Saradomin hilt",
+      "Saradomin sword",
+      "Saradomin's light",
+      "Godsword shard 1",
+      "Godsword shard 2",
+      "Godsword shard 3"
+    ]
+  },
+  {
+    "id": "graardor",
+    "name": "General Graardor",
+    "title": "GWD — Graardor (Bandos)",
+    "group": "God Wars Dungeon",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/General_Graardor.png/200px-General_Graardor.png?4dd90",
+    "drops": [
+      "Pet general graardor",
+      "Bandos chestplate",
+      "Bandos tassets",
+      "Bandos boots",
+      "Bandos hilt",
+      "Godsword shard 1",
+      "Godsword shard 2",
+      "Godsword shard 3"
+    ]
+  },
+  {
+    "id": "kril",
+    "name": "K'ril Tsutsaroth",
+    "title": "GWD — K'ril (Zamorak)",
+    "group": "God Wars Dungeon",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/K%27ril_Tsutsaroth.png/200px-K%27ril_Tsutsaroth.png?73bda",
+    "drops": [
+      "Pet k'ril tsutsaroth",
+      "Staff of the dead",
+      "Zamorakian spear",
+      "Steam battlestaff",
+      "Zamorak hilt",
+      "Godsword shard 1",
+      "Godsword shard 2",
+      "Godsword shard 3"
+    ]
+  },
+  {
+    "id": "dagannoth-supreme",
+    "name": "Dagannoth Supreme",
+    "title": "DKs — Supreme (Range)",
+    "group": "Dagannoth Kings",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dagannoth_Supreme.png/200px-Dagannoth_Supreme.png?81f00",
+    "drops": [
+      "Pet dagannoth supreme",
+      "Archers ring",
+      "Dragon axe",
+      "Seercull"
+    ]
+  },
+  {
+    "id": "dagannoth-rex",
+    "name": "Dagannoth Rex",
+    "title": "DKs — Rex (Melee)",
+    "group": "Dagannoth Kings",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dagannoth_Rex.png/200px-Dagannoth_Rex.png?a99a9",
+    "drops": [
+      "Pet dagannoth rex",
+      "Berserker ring",
+      "Warrior ring",
+      "Dragon axe"
+    ]
+  },
+  {
+    "id": "dagannoth-prime",
+    "name": "Dagannoth Prime",
+    "title": "DKs — Prime (Magic)",
+    "group": "Dagannoth Kings",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dagannoth_Prime.png/200px-Dagannoth_Prime.png?945b1",
+    "drops": [
+      "Pet dagannoth prime",
+      "Seers ring",
+      "Dragon axe",
+      "Mud battlestaff"
+    ]
+  },
+  {
+    "id": "blood-moon",
+    "name": "Blood Moon",
+    "title": "Moons — Blood Moon",
+    "group": "Moons of Peril",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Blood_Moon.png/200px-Blood_Moon.png?c3e72",
+    "drops": [
+      "Blood moon helm",
+      "Blood moon chestplate",
+      "Blood moon tassets",
+      "Dual macuahuitl",
+      "Atlatl dart"
+    ]
+  },
+  {
+    "id": "blue-moon",
+    "name": "Blue Moon",
+    "title": "Moons — Blue Moon",
+    "group": "Moons of Peril",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Blue_Moon.png/200px-Blue_Moon.png?c3e72",
+    "drops": [
+      "Blue moon helm",
+      "Blue moon chestplate",
+      "Blue moon tassets",
+      "Blue moon spear",
+      "Atlatl dart"
+    ]
+  },
+  {
+    "id": "eclipse-moon",
+    "name": "Eclipse Moon",
+    "title": "Moons — Eclipse Moon",
+    "group": "Moons of Peril",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Eclipse_Moon.png/200px-Eclipse_Moon.png?c3e72",
+    "drops": [
+      "Eclipse moon helm",
+      "Eclipse moon chestplate",
+      "Eclipse moon tassets",
+      "Eclipse atlatl",
+      "Atlatl dart"
+    ]
+  },
+  {
+    "id": "duke-sucellus",
+    "name": "Duke Sucellus",
+    "title": "DT2 — Duke Sucellus",
+    "group": "Desert Treasure II",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Duke_Sucellus.png/200px-Duke_Sucellus.png?d588a",
+    "drops": [
+      "Virtus mask",
+      "Virtus robe top",
+      "Virtus robe bottom",
+      "Chromium ingot",
+      "Awakener's orb",
+      "Magus vestige",
+      "Eye of the duke",
+      "Ice quartz",
+      "Frozen tablet",
+      "Baron"
+    ]
+  },
+  {
+    "id": "the-leviathan",
+    "name": "The Leviathan",
+    "title": "DT2 — The Leviathan",
+    "group": "Desert Treasure II",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/The_Leviathan.png/200px-The_Leviathan.png?d588a",
+    "drops": [
+      "Virtus mask",
+      "Virtus robe top",
+      "Virtus robe bottom",
+      "Chromium ingot",
+      "Awakener's orb",
+      "Venator vestige",
+      "Leviathan's lure",
+      "Smoke quartz",
+      "Scarred tablet",
+      "Lil'viathan"
+    ]
+  },
+  {
+    "id": "the-whisperer",
+    "name": "The Whisperer",
+    "title": "DT2 — The Whisperer",
+    "group": "Desert Treasure II",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/The_Whisperer.png/200px-The_Whisperer.png?aedab",
+    "drops": [
+      "Virtus mask",
+      "Virtus robe top",
+      "Virtus robe bottom",
+      "Chromium ingot",
+      "Awakener's orb",
+      "Bellator vestige",
+      "Siren's staff",
+      "Shadow quartz",
+      "Sirenic tablet",
+      "Wisp"
+    ]
+  },
+  {
+    "id": "vardorvis",
+    "name": "Vardorvis",
+    "title": "DT2 — Vardorvis",
+    "group": "Desert Treasure II",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Vardorvis.png/200px-Vardorvis.png?48af8",
+    "drops": [
+      "Virtus mask",
+      "Virtus robe top",
+      "Virtus robe bottom",
+      "Chromium ingot",
+      "Awakener's orb",
+      "Ultor vestige",
+      "Executioner's axe head",
+      "Blood quartz",
+      "Strangled tablet",
+      "Butch"
+    ]
+  },
+  {
+    "id": "chambers-of-xeric",
+    "name": "Chambers of Xeric",
+    "title": "Chambers of Xeric",
+    "group": "Raids",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Chambers_of_Xeric_logo.png/200px-Chambers_of_Xeric_logo.png?34a98",
+    "drops": [
+      "Dexterous prayer scroll",
+      "Arcane prayer scroll",
+      "Twisted buckler",
+      "Dragon hunter crossbow",
+      "Dinh's bulwark",
+      "Ancestral hat",
+      "Ancestral robe top",
+      "Ancestral robe bottom",
+      "Dragon claws",
+      "Elder maul",
+      "Kodai insignia",
+      "Twisted bow"
+    ]
+  },
+  {
+    "id": "theatre-of-blood",
+    "name": "Theatre of Blood",
+    "title": "Theatre of Blood",
+    "group": "Raids",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Theatre_of_Blood_logo.png/200px-Theatre_of_Blood_logo.png?e6e68",
+    "drops": [
+      "Avernic defender hilt",
+      "Justiciar faceguard",
+      "Justiciar chestguard",
+      "Justiciar legguards",
+      "Ghrazi rapier",
+      "Sanguinesti staff",
+      "Scythe of vitur"
+    ]
+  },
+  {
+    "id": "tombs-of-amascut",
+    "name": "Tombs of Amascut",
+    "title": "Tombs of Amascut",
+    "group": "Raids",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Tombs_of_Amascut.png/200px-Tombs_of_Amascut.png?f9992",
+    "drops": [
+      "Osmumten's fang",
+      "Lightbearer",
+      "Elidinis' ward",
+      "Masori mask",
+      "Masori body",
+      "Masori chaps",
+      "Tumeken's shadow"
+    ]
+  },
+  {
+    "id": "zulrah",
+    "name": "Zulrah",
+    "title": "Zulrah",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Zulrah_%28serpentine%29.png/200px-Zulrah_%28serpentine%29.png?29a54",
+    "drops": [
+      "Pet snakeling",
+      "Tanzanite mutagen",
+      "Magma mutagen",
+      "Jar of swamp",
+      "Magic fang",
+      "Serpentine visage",
+      "Tanzanite fang",
+      "Zul-andra teleport",
+      "Uncut onyx",
+      "Zulrah's scales"
+    ]
+  },
+  {
+    "id": "vorkath",
+    "name": "Vorkath",
+    "title": "Vorkath",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Vorkath.png/200px-Vorkath.png?1ce3f",
+    "drops": [
+      "Vorki",
+      "Vorkath's head",
+      "Draconic visage",
+      "Skeletal visage",
+      "Jar of decay",
+      "Dragonbone necklace"
+    ]
+  },
+  {
+    "id": "nightmare",
+    "name": "The Nightmare",
+    "title": "The Nightmare",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/The_Nightmare.png/200px-The_Nightmare.png?0128a",
+    "drops": [
+      "Little nightmare",
+      "Inquisitor's mace",
+      "Inquisitor's great helm",
+      "Inquisitor's hauberk",
+      "Inquisitor's plateskirt",
+      "Nightmare staff",
+      "Volatile orb",
+      "Harmonised orb",
+      "Eldritch orb",
+      "Jar of dreams",
+      "Slepey tablet",
+      "Parasitic egg"
+    ]
+  },
+  {
+    "id": "phantom-muspah",
+    "name": "Phantom Muspah",
+    "title": "Phantom Muspah",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Phantom_Muspah_%28ranged%29.png/200px-Phantom_Muspah_%28ranged%29.png?9cf6a",
+    "drops": [
+      "Muphin",
+      "Venator shard",
+      "Ancient icon",
+      "Charged ice",
+      "Frozen cache",
+      "Ancient essence"
+    ]
+  },
+  {
+    "id": "yama",
+    "name": "Yama",
+    "title": "Yama",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Yama.png/200px-Yama.png?7653a",
+    "drops": [
+      "Yami",
+      "Soulflame horn",
+      "Oathplate helm",
+      "Oathplate chest",
+      "Oathplate legs",
+      "Oathplate shards",
+      "Barrel of demonic tallow",
+      "Forgotten lockbox",
+      "Dossier",
+      "Diabolic worms",
+      "Chasm teleport scroll"
+    ]
+  },
+  {
+    "id": "obor",
+    "name": "Obor",
+    "title": "Obor",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Obor.png/200px-Obor.png?08bc8",
+    "drops": [
+      "Hill giant club"
+    ]
+  },
+  {
+    "id": "bryophyta",
+    "name": "Bryophyta",
+    "title": "Bryophyta",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Bryophyta.png/200px-Bryophyta.png?08bc8",
+    "drops": [
+      "Bryophyta's essence"
+    ]
+  },
+  {
+    "id": "amoxliatl",
+    "name": "Amoxliatl",
+    "title": "Amoxliatl",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Amoxliatl.png/200px-Amoxliatl.png?01b12",
+    "drops": [
+      "Moxi",
+      "Glacial temotli",
+      "Pendant of ates (inert)",
+      "Frozen tear"
+    ]
+  },
+  {
+    "id": "royal-titans",
+    "name": "Royal Titans",
+    "title": "Royal Titans",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Eldric_the_Ice_King.png/200px-Eldric_the_Ice_King.png?6bd48",
+    "drops": [
+      "Bran",
+      "Deadeye prayer scroll",
+      "Mystic vigour prayer scroll",
+      "Fire element staff crown",
+      "Ice element staff crown",
+      "Giantsoul amulet",
+      "Desiccated page"
+    ]
+  },
+  {
+    "id": "doom-of-mokhaiotl",
+    "name": "Doom of Mokhaiotl",
+    "title": "Doom of Mokhaiotl",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Doom_of_Mokhaiotl.png/200px-Doom_of_Mokhaiotl.png?e5edb",
+    "drops": [
+      "Dom",
+      "Avernic treads",
+      "Eye of ayak (uncharged)",
+      "Mokhaiotl cloth",
+      "Mokhaiotl waystone",
+      "Demon tear"
+    ]
+  },
+  {
+    "id": "corporeal-beast",
+    "name": "Corporeal Beast",
+    "title": "Corporeal Beast",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Corporeal_Beast.png/200px-Corporeal_Beast.png?52ebb",
+    "drops": [
+      "Pet dark core",
+      "Elysian sigil",
+      "Arcane sigil",
+      "Spectral sigil",
+      "Holy elixir",
+      "Spirit shield"
+    ]
+  },
+  {
+    "id": "kalphite-queen",
+    "name": "Kalphite Queen",
+    "title": "Kalphite Queen",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Kalphite_Queen.png/200px-Kalphite_Queen.png?a4955",
+    "drops": [
+      "Kalphite princess",
+      "Kq head",
+      "Jar of sand",
+      "Dragon 2h sword",
+      "Dragon chainbody",
+      "Dragon pickaxe"
+    ]
+  },
+  {
+    "id": "sarachnis",
+    "name": "Sarachnis",
+    "title": "Sarachnis",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Sarachnis.png/200px-Sarachnis.png?8f040",
+    "drops": [
+      "Sraracha",
+      "Jar of eyes",
+      "Giant egg sac",
+      "Sarachnis cudgel",
+      "Pristine spider silk"
+    ]
+  },
+  {
+    "id": "scurrius",
+    "name": "Scurrius",
+    "title": "Scurrius",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Scurrius.png/200px-Scurrius.png?e66a5",
+    "drops": [
+      "Scurrius' spine",
+      "Scurry"
+    ]
+  },
+  {
+    "id": "giant-mole",
+    "name": "Giant Mole",
+    "title": "Giant Mole",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Giant_Mole.png/200px-Giant_Mole.png?3f58a",
+    "drops": [
+      "Baby mole",
+      "Immaculate mole skin",
+      "Mole skin",
+      "Mole claw"
+    ]
+  },
+  {
+    "id": "the-hueycoatl",
+    "name": "The Hueycoatl",
+    "title": "The Hueycoatl",
+    "group": null,
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/The_Hueycoatl.png/200px-The_Hueycoatl.png?7b216",
+    "drops": [
+      "Huberte",
+      "Dragon hunter wand",
+      "Hueycoatl hide",
+      "Tome of earth (empty)",
+      "Soiled page",
+      "Huasca seed"
+    ]
+  },
+  {
+    "id": "chaos-fanatic",
+    "name": "Chaos Fanatic",
+    "title": "Wilderness — Chaos Fanatic",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Chaos_Fanatic.png/200px-Chaos_Fanatic.png?8871d",
+    "drops": [
+      "Pet chaos elemental",
+      "Odium shard 1",
+      "Malediction shard 1"
+    ]
+  },
+  {
+    "id": "crazy-archaeologist",
+    "name": "Crazy archaeologist",
+    "title": "Wilderness — Crazy Archaeologist",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Crazy_archaeologist.png/200px-Crazy_archaeologist.png?3ecc9",
+    "drops": [
+      "Odium shard 2",
+      "Malediction shard 2",
+      "Fedora"
+    ]
+  },
+  {
+    "id": "scorpia",
+    "name": "Scorpia",
+    "title": "Wilderness — Scorpia",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Scorpia.png/200px-Scorpia.png?517c9",
+    "drops": [
+      "Scorpia's offspring",
+      "Odium shard 3",
+      "Malediction shard 3",
+      "Dragon 2h sword"
+    ]
+  },
+  {
+    "id": "king-black-dragon",
+    "name": "King Black Dragon",
+    "title": "Wilderness — King Black Dragon",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/King_Black_Dragon.png/200px-King_Black_Dragon.png?d25f0",
+    "drops": [
+      "Prince black dragon",
+      "Kbd heads",
+      "Dragon pickaxe",
+      "Draconic visage"
+    ]
+  },
+  {
+    "id": "chaos-elemental",
+    "name": "Chaos Elemental",
+    "title": "Wilderness — Chaos Elemental",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Chaos_Elemental.png/200px-Chaos_Elemental.png?c170c",
+    "drops": [
+      "Pet chaos elemental",
+      "Dragon pickaxe",
+      "Dragon 2h sword"
+    ]
+  },
+  {
+    "id": "revenant-maledictus",
+    "name": "Revenant maledictus",
+    "title": "Wilderness — Revenant Maledictus",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Revenant_maledictus.png/200px-Revenant_maledictus.png?73c48",
+    "drops": [
+      "Amulet of avarice",
+      "Craw's bow (u)",
+      "Thammaron's sceptre (u)",
+      "Viggora's chainmace (u)",
+      "Ancient crystal"
+    ]
+  },
+  {
+    "id": "vetion",
+    "name": "Vet'ion",
+    "title": "Wilderness — Vet'ion",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Calvar%27ion.png/200px-Calvar%27ion.png?6268f",
+    "drops": [
+      "Vet'ion jr.",
+      "Ring of the gods",
+      "Dragon pickaxe",
+      "Dragon 2h sword",
+      "Skull of vet'ion",
+      "Voidwaker blade"
+    ]
+  },
+  {
+    "id": "venenatis",
+    "name": "Venenatis",
+    "title": "Wilderness — Venenatis",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Spindel.png/200px-Spindel.png?2c818",
+    "drops": [
+      "Venenatis spiderling",
+      "Treasonous ring",
+      "Dragon pickaxe",
+      "Dragon 2h sword",
+      "Fangs of venenatis",
+      "Voidwaker gem"
+    ]
+  },
+  {
+    "id": "callisto",
+    "name": "Callisto",
+    "title": "Wilderness — Callisto",
+    "group": "Wilderness",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Artio.png/200px-Artio.png?bfba7",
+    "drops": [
+      "Callisto cub",
+      "Tyrannical ring",
+      "Dragon pickaxe",
+      "Dragon 2h sword",
+      "Claws of callisto",
+      "Voidwaker hilt"
+    ]
+  },
+  {
+    "id": "grotesque-guardians",
+    "name": "Grotesque Guardians",
+    "title": "Grotesque Guardians",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dusk.png/200px-Dusk.png?2d6f0",
+    "drops": [
+      "Noon",
+      "Black tourmaline core",
+      "Granite gloves",
+      "Granite ring",
+      "Granite hammer",
+      "Jar of stone",
+      "Granite dust"
+    ]
+  },
+  {
+    "id": "abyssal-sire",
+    "name": "Abyssal Sire",
+    "title": "Abyssal Sire",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Abyssal_Sire_%28phase_1%29.png/200px-Abyssal_Sire_%28phase_1%29.png?0db8f",
+    "drops": [
+      "Abyssal orphan",
+      "Unsired",
+      "Abyssal head",
+      "Bludgeon spine",
+      "Bludgeon claw",
+      "Bludgeon axon",
+      "Jar of miasma",
+      "Abyssal dagger",
+      "Abyssal whip"
+    ]
+  },
+  {
+    "id": "kraken",
+    "name": "Kraken",
+    "title": "Kraken",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Cave_kraken.png/200px-Cave_kraken.png?4612a",
+    "drops": [
+      "Pet kraken",
+      "Kraken tentacle",
+      "Trident of the seas (full)",
+      "Jar of dirt"
+    ]
+  },
+  {
+    "id": "cerberus",
+    "name": "Cerberus",
+    "title": "Cerberus",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Cerberus.png/200px-Cerberus.png?47f4c",
+    "drops": [
+      "Hellpuppy",
+      "Eternal crystal",
+      "Pegasian crystal",
+      "Primordial crystal",
+      "Jar of souls",
+      "Smouldering stone",
+      "Key master teleport"
+    ]
+  },
+  {
+    "id": "thermonuclear-smoke-devil",
+    "name": "Thermonuclear smoke devil",
+    "title": "Thermonuclear Smoke Devil",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Thermonuclear_smoke_devil.png/200px-Thermonuclear_smoke_devil.png?de858",
+    "drops": [
+      "Pet smoke devil",
+      "Occult necklace",
+      "Smoke battlestaff",
+      "Dragon chainbody",
+      "Jar of smoke"
+    ]
+  },
+  {
+    "id": "alchemical-hydra",
+    "name": "Alchemical Hydra",
+    "title": "Alchemical Hydra",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Alchemical_Hydra_%28serpentine%29.png/200px-Alchemical_Hydra_%28serpentine%29.png?925dd",
+    "drops": [
+      "Ikkle hydra",
+      "Hydra's claw",
+      "Hydra tail",
+      "Hydra leather",
+      "Hydra's fang",
+      "Hydra's eye",
+      "Hydra's heart",
+      "Dragon knife",
+      "Dragon thrownaxe",
+      "Jar of chemicals",
+      "Alchemical hydra heads"
+    ]
+  },
+  {
+    "id": "araxxor",
+    "name": "Araxxor",
+    "title": "Araxxor",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Araxxor.png/200px-Araxxor.png?35d2e",
+    "drops": [
+      "Nid",
+      "Araxyte venom sac",
+      "Spider cave teleport",
+      "Araxyte fang",
+      "Noxious point",
+      "Noxious blade",
+      "Noxious pommel",
+      "Araxyte head",
+      "Jar of venom",
+      "Coagulated venom"
+    ]
+  },
+  {
+    "id": "shellbane-gryphon",
+    "name": "Shellbane gryphon",
+    "title": "Shellbane Gryphon",
+    "group": "Slayer",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Shellbane_gryphon.png/200px-Shellbane_gryphon.png?bc76e",
+    "drops": [
+      "Gull",
+      "Jar of feathers",
+      "Belle's folly (tarnished)",
+      "Gryphon feather"
+    ]
+  },
+  {
+    "id": "crystalline-hunllef",
+    "name": "Crystalline Hunllef",
+    "title": "The Gauntlet — Crystalline Hunllef",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Crystalline_Hunllef.png/200px-Crystalline_Hunllef.png?7737a",
+    "drops": [
+      "Youngllef",
+      "Crystal armour seed",
+      "Crystal weapon seed",
+      "Enhanced crystal weapon seed"
+    ]
+  },
+  {
+    "id": "corrupted-hunllef",
+    "name": "Corrupted Hunllef",
+    "title": "Corrupted Gauntlet — Corrupted Hunllef",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Corrupted_Hunllef.png/200px-Corrupted_Hunllef.png?0cd55",
+    "drops": [
+      "Youngllef",
+      "Crystal armour seed",
+      "Crystal weapon seed",
+      "Enhanced crystal weapon seed",
+      "Gauntlet cape"
+    ]
+  },
+  {
+    "id": "tzkok-jad",
+    "name": "TzTok-Jad",
+    "title": "Fight Caves — TzTok-Jad",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/TzTok-Jad.png/200px-TzTok-Jad.png?df681",
+    "drops": [
+      "Tzrek-jad",
+      "Fire cape"
+    ]
+  },
+  {
+    "id": "tzkal-zuk",
+    "name": "TzKal-Zuk",
+    "title": "Inferno — TzKal-Zuk",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/TzKal-Zuk.png/200px-TzKal-Zuk.png?2d222",
+    "drops": [
+      "Jal-nib-rek",
+      "Infernal cape"
+    ]
+  },
+  {
+    "id": "sol-heredit",
+    "name": "Sol Heredit",
+    "title": "Fortis Colosseum — Sol Heredit",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Sol_Heredit.png/200px-Sol_Heredit.png?91250",
+    "drops": [
+      "Smol heredit",
+      "Dizana's quiver (uncharged)",
+      "Sunfire fanatic cuirass",
+      "Sunfire fanatic chausses",
+      "Sunfire fanatic helm",
+      "Echo crystal",
+      "Tonalztics of ralos (uncharged)",
+      "Sunfire splinters"
+    ]
+  }
+]

@@ -6,6 +6,7 @@ import type { TileType } from "@/lib/types";
 function validateTilePayload(body: {
   position?: number;
   type?: TileType;
+  display_title?: string | null;
   boss_name?: string | null;
   required_drops?: number | null;
   accepted_drops?: string | null;
@@ -16,7 +17,10 @@ function validateTilePayload(body: {
   const position = Number(body.position);
   if (!position || position < 1 || position > 25) return "Position must be between 1 and 25.";
   if (body.type !== "drop" && body.type !== "xp") return "Tile type must be drop or xp.";
-  if (body.type === "drop" && (!body.boss_name?.trim() || !Number(body.required_drops))) return "Drop tiles need a boss and required drops.";
+  if (body.type === "drop") {
+    const hasIdentifier = body.boss_name?.trim() || body.display_title?.trim();
+    if (!hasIdentifier || !Number(body.required_drops)) return "Drop tiles need a boss/title and required drops.";
+  }
   if (body.type === "xp" && (!body.skill_name?.trim() || !Number(body.required_xp))) return "XP tiles need a skill and required XP.";
   return null;
 }
@@ -30,6 +34,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const body = (await request.json()) as {
       position?: number;
       type?: TileType;
+      display_title?: string | null;
       boss_name?: string | null;
       required_drops?: number | null;
       accepted_drops?: string | null;
@@ -44,11 +49,12 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const env = await getEnv();
     await env.DB.prepare(`
       UPDATE tiles
-      SET position = ?, type = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
+      SET position = ?, type = ?, display_title = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
       WHERE id = ?
     `).bind(
       Number(body.position),
       body.type,
+      body.display_title?.trim() ?? null,
       body.type === "drop" ? body.boss_name?.trim() ?? null : null,
       body.type === "drop" ? Number(body.required_drops) : null,
       body.type === "drop" ? (body.accepted_drops ?? null) : null,
