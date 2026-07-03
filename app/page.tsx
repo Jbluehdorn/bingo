@@ -62,12 +62,6 @@ export default async function HomePage() {
 
       <StatusBanner status={game.status} winnerName={winner?.name} />
 
-      <div className="flex justify-center">
-        <Link href="/" className="osrs-button inline-flex items-center gap-2">
-          Refresh Progress
-        </Link>
-      </div>
-
       {orderedTeams.length === 2 && progress.length > 0 ? (
         <div className="grid gap-6 xl:grid-cols-2">
           {orderedTeams.map((team, index) => (
@@ -79,6 +73,12 @@ export default async function HomePage() {
           Configure all 25 tiles in the admin panel to see the live boards.
         </div>
       )}
+
+      <div className="flex justify-center">
+        <Link href="/" className="osrs-button inline-flex items-center gap-2">
+          ↻ Refresh Progress
+        </Link>
+      </div>
     </div>
   );
 }

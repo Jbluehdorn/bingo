@@ -20,12 +20,6 @@ export default function RootLayout({
             <Link href="/" className="text-2xl font-bold tracking-wide text-osrs-text-bright">
               OSRS Bingo
             </Link>
-            <Link
-              href="/admin"
-              className="rounded border border-osrs-border px-3 py-2 text-sm font-semibold text-osrs-text hover:bg-osrs-panel"
-            >
-              ⚙ Admin
-            </Link>
           </nav>
         </header>
         <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-6">{children}</main>
