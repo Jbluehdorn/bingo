@@ -63,6 +63,7 @@ export default function AdminPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<"Game" | "Teams" | "Tiles" | "Drops" | "Pets">("Game");
 
   async function fetchAdminData() {
     const [gameResponse, tilesResponse, dropsResponse] = await Promise.all([
@@ -371,8 +372,6 @@ export default function AdminPage() {
   }
 
   const tabs = ["Game", "Teams", "Tiles", "Drops", "Pets"] as const;
-  type Tab = (typeof tabs)[number];
-  const [activeTab, setActiveTab] = useState<Tab>("Game");
 
   return (
     <div className="flex flex-col gap-6">
