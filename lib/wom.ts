@@ -1,0 +1,42 @@
+import { OSRS_SKILLS } from "@/lib/types";
+
+const WOM_BASE_URL = "https://api.wiseoldman.net/v2/players";
+
+function getPlayerUrl(username: string): string {
+  return `${WOM_BASE_URL}/${encodeURIComponent(username)}`;
+}
+
+export async function validatePlayer(username: string): Promise<boolean> {
+  const trimmed = username.trim();
+  if (!trimmed) return false;
+
+  const response = await fetch(getPlayerUrl(trimmed), { method: "GET" });
+  return response.ok;
+}
+
+export async function getPlayerXp(username: string): Promise<Record<string, number>> {
+  const response = await fetch(getPlayerUrl(username.trim()), { method: "GET" });
+  if (!response.ok) {
+    throw new Error(`Unable to fetch WOM data for ${username}.`);
+  }
+
+  const payload = (await response.json()) as {
+    latestSnapshot?: {
+      data?: {
+        skills?: Record<string, { experience?: number }>;
+      };
+    };
+  };
+
+  const skills = payload.latestSnapshot?.data?.skills ?? {};
+  return Object.fromEntries(
+    OSRS_SKILLS.map((skill) => [skill, Number(skills[skill]?.experience ?? 0)]),
+  );
+}
+
+export async function updatePlayer(username: string): Promise<void> {
+  const response = await fetch(getPlayerUrl(username.trim()), { method: "POST" });
+  if (!response.ok) {
+    throw new Error(`Unable to update WOM data for ${username}.`);
+  }
+}

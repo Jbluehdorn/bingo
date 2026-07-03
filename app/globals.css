@@ -1,26 +1,104 @@
+@import url("https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --osrs-bg: #1a1209;
+  --osrs-panel: #2c1e0f;
+  --osrs-panel-dark: #1f1508;
+  --osrs-border: #8b6914;
+  --osrs-border-light: #c8a04a;
+  --osrs-text: #e8d48b;
+  --osrs-text-bright: #ffeb7f;
+  --osrs-text-muted: #a08040;
+  --osrs-green: #1a3d1a;
+  --osrs-green-border: #2d7a2d;
+  --osrs-red: #3d1a1a;
+  --osrs-red-border: #7a2d2d;
+  --osrs-button: #5a3a0a;
+  --osrs-button-hover: #7a5010;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-osrs-bg: var(--osrs-bg);
+  --color-osrs-panel: var(--osrs-panel);
+  --color-osrs-panel-dark: var(--osrs-panel-dark);
+  --color-osrs-border: var(--osrs-border);
+  --color-osrs-border-light: var(--osrs-border-light);
+  --color-osrs-text: var(--osrs-text);
+  --color-osrs-text-bright: var(--osrs-text-bright);
+  --color-osrs-text-muted: var(--osrs-text-muted);
+  --color-osrs-green: var(--osrs-green);
+  --color-osrs-green-border: var(--osrs-green-border);
+  --color-osrs-red: var(--osrs-red);
+  --color-osrs-red-border: var(--osrs-red-border);
+  --color-osrs-button: var(--osrs-button);
+  --color-osrs-button-hover: var(--osrs-button-hover);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--osrs-bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #3c2712 0%, var(--osrs-bg) 35%);
+  color: var(--osrs-text);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "MedievalSharp", serif;
+  color: var(--osrs-text-bright);
+}
+
+a {
+  color: inherit;
+}
+
+.osrs-panel {
+  background: var(--osrs-panel);
+  border: 2px solid var(--osrs-border);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.4), inset 0 0 12px rgb(0 0 0 / 0.2);
+}
+
+.osrs-button {
+  background: linear-gradient(180deg, #7f5617 0%, var(--osrs-button) 100%);
+  border: 1px solid var(--osrs-border-light);
+  border-radius: 4px;
+  color: var(--osrs-text-bright);
+  cursor: pointer;
+  padding: 0.65rem 1rem;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.osrs-button:hover:enabled {
+  background: linear-gradient(180deg, #95671f 0%, var(--osrs-button-hover) 100%);
+  transform: translateY(-1px);
+}
+
+.osrs-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.osrs-input {
+  background: var(--osrs-panel-dark);
+  border: 1px solid var(--osrs-border);
+  border-radius: 4px;
+  color: var(--osrs-text);
+  padding: 0.65rem 0.75rem;
+  width: 100%;
+}
+
+.osrs-input::placeholder {
+  color: var(--osrs-text-muted);
+}
+
+.osrs-input:focus {
+  border-color: var(--osrs-border-light);
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(200 160 74 / 0.2);
 }
