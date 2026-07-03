@@ -12,7 +12,7 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
     "db:migrate:local": "wrangler d1 execute bingo-db --local --file=migrations/0001_initial.sql",
     "db:migrate:remote": "wrangler d1 execute bingo-db --remote --file=migrations/0001_initial.sql",
-    "db:reset:local": "Remove-Item -Recurse -Force .wrangler -ErrorAction SilentlyContinue; npm run db:migrate:local"
+    "db:reset:local": "if exist .wrangler (rd /s /q .wrangler) && npm run db:migrate:local"
   },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20260626.1",
