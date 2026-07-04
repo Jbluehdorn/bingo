@@ -312,13 +312,13 @@ export default function AdminPage() {
     }
   }
 
-  async function handleTeamSave(teamId: number) {
+  async function doSaveTeamName(teamId: number, name: string) {
     setTeamNameStatus((s) => ({ ...s, [teamId]: "saving" }));
     try {
       const response = await fetch(`/api/teams/${teamId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: teamNames[teamId] ?? "" }),
+        body: JSON.stringify({ name }),
       });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Failed to save team.");
@@ -328,9 +328,9 @@ export default function AdminPage() {
     }
   }
 
-  function scheduleTeamNameSave(teamId: number) {
+  function scheduleTeamNameSave(teamId: number, name: string) {
     clearTimeout(teamNameTimers.current[teamId]);
-    teamNameTimers.current[teamId] = setTimeout(() => void handleTeamSave(teamId), 1000);
+    teamNameTimers.current[teamId] = setTimeout(() => void doSaveTeamName(teamId, name), 1000);
   }
 
   async function handleTeamPhotoUpload(teamId: number, file: File | null) {
@@ -682,7 +682,7 @@ export default function AdminPage() {
                   <div className="flex-1">
                     <label className="mb-2 block text-sm font-semibold">Team Name</label>
                     <div className="flex items-center gap-2">
-                      <input className="osrs-input" value={teamNames[team.id] ?? team.name} onChange={(event) => { setTeamNames((current) => ({ ...current, [team.id]: event.target.value })); setTeamNameStatus((s) => ({ ...s, [team.id]: "" })); scheduleTeamNameSave(team.id); }} />
+                      <input className="osrs-input" value={teamNames[team.id] ?? team.name} onChange={(event) => { const newName = event.target.value; setTeamNames((current) => ({ ...current, [team.id]: newName })); setTeamNameStatus((s) => ({ ...s, [team.id]: "" })); scheduleTeamNameSave(team.id, newName); }} />
                       <span className="text-xs text-osrs-text-muted">
                         {teamNameStatus[team.id] === "saving" ? "Saving…" : teamNameStatus[team.id] === "saved" ? "✓ Saved" : teamNameStatus[team.id] === "error" ? "Error" : ""}
                       </span>
