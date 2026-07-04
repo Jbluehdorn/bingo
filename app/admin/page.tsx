@@ -770,7 +770,7 @@ export default function AdminPage() {
               <p className="mb-3 text-xs text-osrs-text-muted"><span className="text-red-400">*</span> Required field · Changes save automatically</p>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 md:col-span-2">
                   <span className="font-semibold">Type <span className="text-red-400">*</span></span>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "drop"} onChange={() => setTileEditor((current) => ({ ...current, type: "drop", display_title: "" }))} />Drop</label>
