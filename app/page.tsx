@@ -84,7 +84,13 @@ export default async function HomePage() {
       <StatusBanner
         status={game.status}
         winnerName={winner?.name}
-        scheduledStartAt={game.scheduled_start_at}
+        scheduledStartAt={
+          // Only pass a future scheduled time — if it's already past (auto-start failed),
+          // don't show a countdown or we get an infinite reload loop.
+          game.scheduled_start_at && new Date(game.scheduled_start_at) > new Date()
+            ? game.scheduled_start_at
+            : null
+        }
       />
 
       {orderedTeams.length === 2 && progress.length > 0 ? (

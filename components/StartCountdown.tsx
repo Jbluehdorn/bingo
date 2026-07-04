@@ -15,9 +15,13 @@ function formatDuration(ms: number): string {
  *  Automatically reloads the page when the countdown expires. */
 export default function StartCountdown({ targetUtc }: { targetUtc: string }) {
   const target = new Date(targetUtc).getTime();
-  const [remaining, setRemaining] = useState(target - Date.now());
+  const initialRemaining = target - Date.now();
+  const [remaining, setRemaining] = useState(initialRemaining);
 
   useEffect(() => {
+    // Guard: if the target is already in the past when this mounts, don't reload.
+    if (initialRemaining <= 0) return;
+
     const id = setInterval(() => {
       const diff = target - Date.now();
       setRemaining(diff);
@@ -27,6 +31,7 @@ export default function StartCountdown({ targetUtc }: { targetUtc: string }) {
       }
     }, 1000);
     return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target]);
 
   const localTime = new Date(targetUtc).toLocaleString(undefined, {
