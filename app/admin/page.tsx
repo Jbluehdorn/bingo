@@ -690,7 +690,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <input className="osrs-input" placeholder="Wise Old Man username" value={newPlayers[team.id] ?? ""} onChange={(event) => setNewPlayers((current) => ({ ...current, [team.id]: event.target.value }))} />
+                  <input className="osrs-input" placeholder="Wise Old Man username" value={newPlayers[team.id] ?? ""} onChange={(event) => setNewPlayers((current) => ({ ...current, [team.id]: event.target.value }))} onKeyDown={(e) => { if (e.key === "Enter") void handleAddPlayer(team.id); }} />
                   <button type="button" className="osrs-button" onClick={() => void handleAddPlayer(team.id)}>Add player</button>
                 </div>
               </div>
