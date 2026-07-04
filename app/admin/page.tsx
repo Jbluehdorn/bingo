@@ -75,7 +75,7 @@ function AdminTileCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group relative flex min-h-34 flex-col gap-1.5 rounded border p-2 text-left transition-all ${
+      className={`group relative flex min-h-34 cursor-pointer flex-col gap-1.5 rounded border p-2 text-left transition-all ${
         isSelected
           ? "border-blue-400 bg-osrs-panel ring-2 ring-blue-400/40"
           : tile

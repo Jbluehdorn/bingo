@@ -8,6 +8,33 @@ import bossData from "@/data/bosses.json";
 
 const BOSSES = bossData as BossEntry[];
 
+// Synthetic group-level entries — one per multi-boss group, with pooled drops.
+const GROUP_ENTRIES: BossEntry[] = (() => {
+  const map = new Map<string, BossEntry[]>();
+  for (const boss of BOSSES) {
+    if (!boss.group) continue;
+    if (!map.has(boss.group)) map.set(boss.group, []);
+    map.get(boss.group)!.push(boss);
+  }
+  const entries: BossEntry[] = [];
+  for (const [groupName, bosses] of map) {
+    if (bosses.length < 2) continue;
+    const drops = [...new Set(bosses.flatMap((b) => b.drops))];
+    entries.push({
+      id: `group:${groupName}`,
+      name: groupName,
+      title: `All ${groupName} bosses · ${drops.length} unique drops`,
+      group: groupName,
+      imageUrl: bosses[0].imageUrl,
+      drops,
+    });
+  }
+  return entries;
+})();
+
+// Combined search pool: group entries first, then individual bosses
+const ALL_ENTRIES = [...GROUP_ENTRIES, ...BOSSES];
+
 function searchBosses(query: string): BossEntry[] {
   const q = query.toLowerCase().trim();
   if (!q) return [];
@@ -15,14 +42,14 @@ function searchBosses(query: string): BossEntry[] {
   const results: BossEntry[] = [];
   const seen = new Set<string>();
 
-  for (const boss of BOSSES) {
-    if (seen.has(boss.id)) continue;
-    const nameMatch = boss.name.toLowerCase().includes(q);
-    const titleMatch = boss.title.toLowerCase().includes(q);
-    const groupMatch = boss.group?.toLowerCase().includes(q) ?? false;
+  for (const entry of ALL_ENTRIES) {
+    if (seen.has(entry.id)) continue;
+    const nameMatch = entry.name.toLowerCase().includes(q);
+    const titleMatch = entry.title.toLowerCase().includes(q);
+    const groupMatch = entry.group?.toLowerCase().includes(q) ?? false;
     if (nameMatch || titleMatch || groupMatch) {
-      results.push(boss);
-      seen.add(boss.id);
+      results.push(entry);
+      seen.add(entry.id);
     }
   }
   return results;
@@ -146,6 +173,7 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
               ) : null}
               {bosses.map((boss) => {
                 const flatIndex = results.indexOf(boss);
+                const isGroupEntry = boss.id.startsWith("group:");
                 return (
                   <button
                     key={boss.id}
@@ -170,8 +198,15 @@ export default function BossSearch({ value, onSelect }: BossSearchProps) {
                         <div className="flex h-full items-center justify-center text-base">⚔️</div>
                       )}
                     </div>
-                    <div className="min-w-0">
-                      <div className="truncate font-semibold">{boss.name}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate font-semibold">{boss.name}</span>
+                        {isGroupEntry && (
+                          <span className="shrink-0 rounded bg-osrs-button px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-osrs-text-bright">
+                            All
+                          </span>
+                        )}
+                      </div>
                       <div className="truncate text-xs text-osrs-text-muted">{boss.title}</div>
                     </div>
                   </button>
