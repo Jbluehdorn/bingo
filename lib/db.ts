@@ -8,9 +8,8 @@ import type {
   TeamTileProgress,
   Tile,
   TileWithProgress,
-  XpSnapshot,
 } from "@/lib/types";
-import { getPlayerXp } from "@/lib/wom";
+import { getPlayerXpGained, updatePlayer } from "@/lib/wom";
 
 function allResults<T>(statement: D1PreparedStatement): Promise<T[]> {
   return statement.all<T>().then((result) => result.results ?? []);
@@ -100,22 +99,6 @@ export async function getDropSubmissionsWithDetails(
   );
 }
 
-export async function getXpSnapshots(
-  db: D1Database,
-  playerIds?: number[],
-): Promise<XpSnapshot[]> {
-  if (!playerIds?.length) {
-    return allResults<XpSnapshot>(db.prepare("SELECT * FROM xp_snapshots ORDER BY player_id ASC"));
-  }
-
-  const inClause = buildInClause(playerIds.length);
-  return allResults<XpSnapshot>(
-    db.prepare(`SELECT * FROM xp_snapshots WHERE player_id IN (${inClause}) ORDER BY player_id ASC`).bind(
-      ...playerIds,
-    ),
-  );
-}
-
 export async function getPetCompletions(db: D1Database): Promise<PetCompletion[]> {
   return allResults<PetCompletion>(db.prepare("SELECT * FROM pet_completions"));
 }
@@ -147,11 +130,11 @@ export async function computeAllTilesProgress(
   db: D1Database,
   tiles: Tile[],
 ): Promise<TileWithProgress[]> {
-  const [teams, players, drops, snapshots, petCompletions] = await Promise.all([
+  const [game, teams, players, drops, petCompletions] = await Promise.all([
+    getGame(db),
     getTeams(db),
     getPlayers(db),
     getDropSubmissions(db),
-    getXpSnapshots(db),
     getPetCompletions(db),
   ]);
 
@@ -180,24 +163,23 @@ export async function computeAllTilesProgress(
   }
 
   const petSet = new Set(petCompletions.map((item) => `${item.tile_id}:${item.team_id}`));
-  const snapshotMap = new Map(
-    snapshots.map((snapshot) => [`${snapshot.player_id}:${snapshot.skill_name.toLowerCase()}`, snapshot.base_xp]),
-  );
 
-  const xpByPlayer = new Map<number, Record<string, number>>();
-  if (tiles.some((tile) => tile.type === "xp") && players.length > 0) {
+  // Fetch XP gained since game start from WOM for all players (only if game is active and has XP tiles)
+  const xpGainedByPlayer = new Map<number, Record<string, number>>();
+  const startedAt = game.status === "active" && game.started_at ? game.started_at : null;
+  if (startedAt && tiles.some((tile) => tile.type === "xp") && players.length > 0) {
     const xpResults = await Promise.all(
       players.map(async (player) => {
         try {
-          return [player.id, await getPlayerXp(player.username)] as const;
+          await updatePlayer(player.username);
+          return [player.id, await getPlayerXpGained(player.username, startedAt)] as const;
         } catch {
           return [player.id, {}] as const;
         }
       }),
     );
-
     for (const [playerId, xp] of xpResults) {
-      xpByPlayer.set(playerId, xp);
+      xpGainedByPlayer.set(playerId, xp);
     }
   }
 
@@ -207,14 +189,10 @@ export async function computeAllTilesProgress(
       const currentDrops = dropCountMap.get(`${tile.id}:${teamId}`) ?? 0;
 
       let currentXp = 0;
-      if (tile.type === "xp" && tile.skill_name) {
+      if (tile.type === "xp" && tile.skill_name && startedAt) {
         const skillName = tile.skill_name.toLowerCase();
         currentXp = (teamPlayers.get(teamId) ?? []).reduce((total, player) => {
-          const baselineRaw = snapshotMap.get(`${player.id}:${skillName}`);
-          // No snapshot means the competition hasn't started yet for this skill — contribute 0.
-          if (baselineRaw === undefined) return total;
-          const current = Number(xpByPlayer.get(player.id)?.[skillName] ?? 0);
-          return total + Math.max(0, current - Number(baselineRaw));
+          return total + (xpGainedByPlayer.get(player.id)?.[skillName] ?? 0);
         }, 0);
       }
 

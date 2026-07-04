@@ -34,6 +34,26 @@ export async function getPlayerXp(username: string): Promise<Record<string, numb
   );
 }
 
+/** Returns XP gained per skill since startDate (ISO string). Uses WOM /gained endpoint. */
+export async function getPlayerXpGained(username: string, startDate: string): Promise<Record<string, number>> {
+  const url = `${getPlayerUrl(username.trim())}/gained?startDate=${encodeURIComponent(startDate)}`;
+  const response = await fetch(url, { method: "GET" });
+  if (!response.ok) {
+    throw new Error(`Unable to fetch WOM gains for ${username}.`);
+  }
+
+  const payload = (await response.json()) as {
+    data?: {
+      skills?: Record<string, { experience?: { gained?: number } }>;
+    };
+  };
+
+  const skills = payload.data?.skills ?? {};
+  return Object.fromEntries(
+    OSRS_SKILLS.map((skill) => [skill, Math.max(0, Number(skills[skill]?.experience?.gained ?? 0))]),
+  );
+}
+
 export async function updatePlayer(username: string): Promise<void> {
   const response = await fetch(getPlayerUrl(username.trim()), { method: "POST" });
   if (!response.ok) {

@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { getEnv } from "@/lib/cloudflare";
-import { getGame, getPlayers, getTiles } from "@/lib/db";
-import { getPlayerXp, updatePlayer, validatePlayer } from "@/lib/wom";
+import { getPlayers } from "@/lib/db";
+import { validatePlayer } from "@/lib/wom";
 
 export async function GET(request: Request) {
   try {
@@ -36,35 +36,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "That player is already added." }, { status: 400 });
     }
 
-    const result = await env.DB.prepare("INSERT INTO players (team_id, username) VALUES (?, ?) RETURNING id").bind(teamId, username).first<{ id: number }>();
-    const playerId = result?.id;
-
-    // If the game is already active, take a snapshot of this player's XP for all XP tile skills
-    // so their progress only counts from the moment they joined.
-    const game = await getGame(env.DB);
-    if (game.status === "active" && playerId) {
-      const tiles = await getTiles(env.DB);
-      const xpSkills = Array.from(
-        new Set(tiles.filter((t) => t.type === "xp" && t.skill_name).map((t) => t.skill_name!.toLowerCase())),
-      );
-      if (xpSkills.length > 0) {
-        await updatePlayer(username);
-        const xp = await getPlayerXp(username);
-        const statements = xpSkills.map((skill) =>
-          env.DB
-            .prepare(
-              `INSERT INTO xp_snapshots (player_id, skill_name, base_xp, snapshot_taken_at)
-               VALUES (?, ?, ?, datetime('now'))
-               ON CONFLICT(player_id, skill_name) DO UPDATE SET
-                 base_xp = excluded.base_xp,
-                 snapshot_taken_at = excluded.snapshot_taken_at`,
-            )
-            .bind(playerId, skill, Number(xp[skill] ?? 0)),
-        );
-        await env.DB.batch(statements);
-      }
-    }
-
+    await env.DB.prepare("INSERT INTO players (team_id, username) VALUES (?, ?)").bind(teamId, username).run();
     return Response.json({ message: "Player added successfully." }, { status: 201 });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "Failed to add player." }, { status: 500 });
