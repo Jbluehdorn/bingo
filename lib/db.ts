@@ -167,14 +167,15 @@ export async function computeAllTilesProgress(
   }
 
   const dropCountMap = new Map<string, number>();
-  const dropContributorsMap = new Map<string, Set<string>>();
-  for (const drop of drops) {
+  const dropContributorsMap = new Map<string, string[]>();
+  // Iterate oldest-first so the contributors list is in chronological drop order
+  for (const drop of [...drops].reverse()) {
     const key = `${drop.tile_id}:${drop.team_id}`;
     dropCountMap.set(key, (dropCountMap.get(key) ?? 0) + 1);
     const player = players.find((p) => p.id === drop.player_id);
     if (player) {
-      if (!dropContributorsMap.has(key)) dropContributorsMap.set(key, new Set());
-      dropContributorsMap.get(key)!.add(player.username);
+      if (!dropContributorsMap.has(key)) dropContributorsMap.set(key, []);
+      dropContributorsMap.get(key)!.push(player.username);
     }
   }
 
@@ -225,7 +226,7 @@ export async function computeAllTilesProgress(
         pet_completed: petCompleted,
         current_drops: currentDrops,
         current_xp: currentXp,
-        contributors: Array.from(dropContributorsMap.get(`${tile.id}:${teamId}`) ?? []),
+        contributors: dropContributorsMap.get(`${tile.id}:${teamId}`) ?? [],
       };
     };
 
