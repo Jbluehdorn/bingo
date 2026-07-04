@@ -141,6 +141,9 @@ export default function AdminPage() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "pending" | "saving" | "saved" | "error">("idle");
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isOpeningTile = useRef(false);
+  const [teamNameStatus, setTeamNameStatus] = useState<Record<number, "saving" | "saved" | "error" | "">>({});
+  const teamNameTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const [teamPhotoStatus, setTeamPhotoStatus] = useState<Record<number, "saving" | "saved" | "error" | "">>({});
 
   async function fetchAdminData() {
     const [gameResponse, tilesResponse, dropsResponse] = await Promise.all([
@@ -310,7 +313,8 @@ export default function AdminPage() {
   }
 
   async function handleTeamSave(teamId: number) {
-    await runAction(async () => {
+    setTeamNameStatus((s) => ({ ...s, [teamId]: "saving" }));
+    try {
       const response = await fetch(`/api/teams/${teamId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -318,14 +322,21 @@ export default function AdminPage() {
       });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Failed to save team.");
-      setMessage(payload.message ?? "Team updated.");
-    });
+      setTeamNameStatus((s) => ({ ...s, [teamId]: "saved" }));
+    } catch {
+      setTeamNameStatus((s) => ({ ...s, [teamId]: "error" }));
+    }
+  }
+
+  function scheduleTeamNameSave(teamId: number) {
+    clearTimeout(teamNameTimers.current[teamId]);
+    teamNameTimers.current[teamId] = setTimeout(() => void handleTeamSave(teamId), 1000);
   }
 
   async function handleTeamPhotoUpload(teamId: number, file: File | null) {
     if (!file) return;
-
-    await runAction(async () => {
+    setTeamPhotoStatus((s) => ({ ...s, [teamId]: "saving" }));
+    try {
       const formData = new FormData();
       formData.append("type", "team-photo");
       formData.append("file", file);
@@ -346,8 +357,11 @@ export default function AdminPage() {
       });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Failed to save team photo.");
-      setMessage(payload.message ?? "Team photo updated.");
-    });
+      setTeamPhotoStatus((s) => ({ ...s, [teamId]: "saved" }));
+      await fetchAdminData();
+    } catch {
+      setTeamPhotoStatus((s) => ({ ...s, [teamId]: "error" }));
+    }
   }
 
   async function handleAddPlayer(teamId: number) {
@@ -667,15 +681,22 @@ export default function AdminPage() {
                   </div>
                   <div className="flex-1">
                     <label className="mb-2 block text-sm font-semibold">Team Name</label>
-                    <div className="flex gap-2">
-                      <input className="osrs-input" value={teamNames[team.id] ?? team.name} onChange={(event) => setTeamNames((current) => ({ ...current, [team.id]: event.target.value }))} />
-                      <button type="button" className="osrs-button" onClick={() => void handleTeamSave(team.id)}>Save</button>
+                    <div className="flex items-center gap-2">
+                      <input className="osrs-input" value={teamNames[team.id] ?? team.name} onChange={(event) => { setTeamNames((current) => ({ ...current, [team.id]: event.target.value })); setTeamNameStatus((s) => ({ ...s, [team.id]: "" })); scheduleTeamNameSave(team.id); }} />
+                      <span className="text-xs text-osrs-text-muted">
+                        {teamNameStatus[team.id] === "saving" ? "Saving…" : teamNameStatus[team.id] === "saved" ? "✓ Saved" : teamNameStatus[team.id] === "error" ? "Error" : ""}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <label className="mb-4 flex flex-col gap-2">
-                  <span className="text-sm font-semibold">Team Photo</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold">Team Photo</span>
+                    <span className="text-xs text-osrs-text-muted">
+                      {teamPhotoStatus[team.id] === "saving" ? "Uploading…" : teamPhotoStatus[team.id] === "saved" ? "✓ Saved" : teamPhotoStatus[team.id] === "error" ? "Error" : ""}
+                    </span>
+                  </div>
                   <input className="osrs-input" type="file" accept="image/*" onChange={(event) => void handleTeamPhotoUpload(team.id, event.target.files?.[0] ?? null)} />
                 </label>
 
