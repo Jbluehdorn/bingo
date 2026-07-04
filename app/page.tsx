@@ -12,10 +12,12 @@ function StatusBanner({
   status,
   winnerName,
   scheduledStartAt,
+  setupError,
 }: {
   status: "setup" | "active" | "completed";
   winnerName?: string | null;
   scheduledStartAt?: string | null;
+  setupError?: string;
 }) {
   if (status === "active") {
     return (
@@ -42,6 +44,14 @@ function StatusBanner({
     );
   }
 
+  if (setupError) {
+    return (
+      <div className="rounded border border-yellow-600 bg-yellow-950/70 px-4 py-3 text-center">
+        <span className="font-semibold">⚠ Setup incomplete —</span> {setupError}
+      </div>
+    );
+  }
+
   return (
     <div className="rounded border border-osrs-border bg-osrs-panel px-4 py-3 text-center font-semibold">
       Waiting for admin to start
@@ -52,6 +62,7 @@ function StatusBanner({
 export default async function HomePage() {
   const env = await getEnv();
   let game = await getGame(env.DB);
+  let autoStartError: string | undefined;
 
   // Auto-transition: if scheduled start has passed and game is still in setup, trigger start.
   if (
@@ -59,7 +70,8 @@ export default async function HomePage() {
     game.scheduled_start_at &&
     new Date(game.scheduled_start_at) <= new Date()
   ) {
-    await performStart(env.DB);
+    const result = await performStart(env.DB);
+    if (result.error) autoStartError = result.error;
     game = await getGame(env.DB);
   }
 
@@ -91,6 +103,7 @@ export default async function HomePage() {
             ? game.scheduled_start_at
             : null
         }
+        setupError={autoStartError}
       />
 
       {orderedTeams.length === 2 && progress.length > 0 ? (

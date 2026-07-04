@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 import type { TeamWithPlayers, TileWithProgress } from "@/lib/types";
 
@@ -122,16 +123,21 @@ export default function LogDropPage({ searchParams }: LogDropPageProps) {
           <h1 className="mb-2 text-3xl">Drop Logged!</h1>
           <p>{successMessage}</p>
         </div>
-        <button
-          type="button"
-          className="osrs-button"
-          onClick={() => {
-            setSuccessMessage("");
-            setError("");
-          }}
-        >
-          Log another drop
-        </button>
+        <div className="flex gap-3">
+          <Link href="/" className="osrs-button flex-1 text-center">
+            ← Back to Game Board
+          </Link>
+          <button
+            type="button"
+            className="osrs-button flex-1"
+            onClick={() => {
+              setSuccessMessage("");
+              setError("");
+            }}
+          >
+            Log another drop
+          </button>
+        </div>
       </div>
     );
   }
