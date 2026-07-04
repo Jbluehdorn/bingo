@@ -31,7 +31,6 @@ interface TileEditorState {
   type: TileType;
   display_title: string;
   boss_name: string;
-  freeform: boolean; // true = skip boss selector, just use display_title + drops + image
   required_drops: number;
   accepted_drops: string[];
   skill_name: string;
@@ -45,7 +44,6 @@ const emptyTileForm = {
   type: "drop" as TileType,
   display_title: "",
   boss_name: "",
-  freeform: false,
   required_drops: 1,
   accepted_drops: [],
   skill_name: "attack",
@@ -167,7 +165,6 @@ export default function AdminPage() {
         type: existing.type,
         display_title: existing.display_title ?? "",
         boss_name: existing.boss_name ?? "",
-        freeform: existing.type === "drop" && !existing.boss_name && !!existing.display_title,
         required_drops: existing.required_drops ?? 1,
         accepted_drops: parseTileAcceptedDrops(existing),
         skill_name: existing.skill_name ?? "attack",
@@ -289,7 +286,7 @@ export default function AdminPage() {
         position: tileEditor.position,
         type: tileEditor.type,
         display_title: tileEditor.display_title.trim() || null,
-        boss_name: tileEditor.type === "drop" && !tileEditor.freeform ? tileEditor.boss_name.trim() : null,
+        boss_name: tileEditor.type === "drop" ? tileEditor.boss_name.trim() : null,
         required_drops: tileEditor.type === "drop" ? Number(tileEditor.required_drops) : null,
         accepted_drops: tileEditor.type === "drop" ? JSON.stringify(tileEditor.accepted_drops) : null,
         skill_name: tileEditor.type === "xp" ? tileEditor.skill_name : null,
@@ -595,10 +592,11 @@ export default function AdminPage() {
           </div>
 
           <div className="mt-6 rounded border border-osrs-border bg-osrs-panel-dark p-4">
-            <h3 className="mb-3 text-xl font-semibold">Tile Editor — Position #{tileEditor.position}</h3>
+            <h3 className="mb-1 text-xl font-semibold">Tile Editor — Position #{tileEditor.position}</h3>
+            <p className="mb-3 text-xs text-osrs-text-muted"><span className="text-red-400">*</span> Required field</p>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <span className="font-semibold">Type</span>
+                <span className="font-semibold">Type <span className="text-red-400">*</span></span>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "drop"} onChange={() => setTileEditor((current) => ({ ...current, type: "drop" }))} />Drop</label>
                   <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "xp"} onChange={() => setTileEditor((current) => ({ ...current, type: "xp" }))} />XP</label>
@@ -607,64 +605,44 @@ export default function AdminPage() {
 
               {tileEditor.type === "drop" ? (
                 <>
-                  {/* Freeform toggle */}
-                  <div className="flex items-center gap-3">
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={tileEditor.freeform}
-                        onChange={(e) =>
-                          setTileEditor((cur) => ({
-                            ...cur,
-                            freeform: e.target.checked,
-                            boss_name: e.target.checked ? "" : cur.boss_name,
-                          }))
-                        }
-                      />
-                      <span className="text-sm">Custom / freeform tile (no boss lookup)</span>
-                    </label>
-                  </div>
-
-                  {/* Display title */}
-                  <label className="flex flex-col gap-2">
+                  {/* Display title — full width */}
+                  <label className="flex flex-col gap-2 md:col-span-2">
                     <span className="font-semibold">
-                      Display Title
-                      <span className="ml-1 text-xs text-osrs-text-muted">(shown on board; auto-filled from boss)</span>
+                      Display Title <span className="text-red-400">*</span>
+                      <span className="ml-1 text-xs font-normal text-osrs-text-muted">(shown on board; auto-filled when you select a boss)</span>
                     </span>
                     <input
                       className="osrs-input"
-                      placeholder={tileEditor.freeform ? "e.g. Barrows Chest" : "Leave blank to use boss name"}
+                      placeholder="e.g. Zulrah, Barrows Chest, Theatre of Blood…"
                       value={tileEditor.display_title}
                       onChange={(e) => setTileEditor((cur) => ({ ...cur, display_title: e.target.value }))}
                     />
                   </label>
 
-                  {/* Boss search — hidden in freeform mode */}
-                  {!tileEditor.freeform && (
-                    <div className="flex flex-col gap-2">
-                      <span className="font-semibold">Boss / Raid</span>
-                      <BossSearch
-                        value={tileEditor.boss_name}
-                        onSelect={(boss: BossEntry) => {
-                          setTileEditor((current) => ({
-                            ...current,
-                            boss_name: boss.name,
-                            display_title: current.display_title || boss.title,
-                            image_url: boss.imageUrl || current.image_url,
-                            accepted_drops: boss.drops,
-                          }));
-                        }}
-                      />
-                    </div>
-                  )}
+                  {/* Boss search */}
+                  <div className="flex flex-col gap-2">
+                    <span className="font-semibold">Boss / Raid <span className="text-xs font-normal text-osrs-text-muted">(optional)</span></span>
+                    <BossSearch
+                      value={tileEditor.boss_name}
+                      onSelect={(boss: BossEntry) => {
+                        setTileEditor((current) => ({
+                          ...current,
+                          boss_name: boss.name,
+                          display_title: current.display_title || boss.title,
+                          image_url: boss.imageUrl || current.image_url,
+                          accepted_drops: boss.drops,
+                        }));
+                      }}
+                    />
+                  </div>
 
                   <label className="flex flex-col gap-2">
-                    <span className="font-semibold">Required Drops</span>
+                    <span className="font-semibold">Required Drops <span className="text-red-400">*</span></span>
                     <input className="osrs-input" type="number" min={1} value={tileEditor.required_drops} onChange={(event) => setTileEditor((current) => ({ ...current, required_drops: Number(event.target.value) }))} />
                   </label>
 
                   <div className="flex flex-col gap-3 md:col-span-2">
-                    <span className="font-semibold">Accepted Drops</span>
+                    <span className="font-semibold">Accepted Drops <span className="text-xs font-normal text-osrs-text-muted">(optional — auto-populated from boss)</span></span>
 
                     <div className="min-h-[2.5rem] flex flex-wrap gap-2 rounded border border-osrs-border bg-osrs-panel-dark p-2">
                       {tileEditor.accepted_drops.length ? (
@@ -686,9 +664,7 @@ export default function AdminPage() {
                         ))
                       ) : (
                         <span className="text-sm text-osrs-text-muted">
-                          {tileEditor.freeform
-                            ? "Add drops manually below."
-                            : "Select a boss to auto-populate, or add manually below."}
+                          Select a boss to auto-populate, or add manually below.
                         </span>
                       )}
                     </div>
@@ -712,20 +688,20 @@ export default function AdminPage() {
               ) : (
                 <>
                   <label className="flex flex-col gap-2">
-                    <span className="font-semibold">Skill</span>
+                    <span className="font-semibold">Skill <span className="text-red-400">*</span></span>
                     <select className="osrs-input" value={tileEditor.skill_name} onChange={(event) => setTileEditor((current) => ({ ...current, skill_name: event.target.value }))}>
                       {OSRS_SKILLS.map((skill) => <option key={skill} value={skill}>{skill}</option>)}
                     </select>
                   </label>
                   <label className="flex flex-col gap-2">
-                    <span className="font-semibold">Required XP</span>
+                    <span className="font-semibold">Required XP <span className="text-red-400">*</span></span>
                     <input className="osrs-input" type="number" min={1} value={tileEditor.required_xp} onChange={(event) => setTileEditor((current) => ({ ...current, required_xp: Number(event.target.value) }))} />
                   </label>
                 </>
               )}
 
               <label className="flex flex-col gap-2 md:col-span-2">
-                <span className="font-semibold">Image URL / Stored Key <span className="text-xs text-osrs-text-muted">(optional — auto-filled from boss)</span></span>
+                <span className="font-semibold">Image URL / Stored Key <span className="text-xs font-normal text-osrs-text-muted">(optional — auto-filled from boss)</span></span>
                 <input className="osrs-input" value={tileEditor.image_url} onChange={(event) => setTileEditor((current) => ({ ...current, image_url: event.target.value }))} />
               </label>
             </div>
