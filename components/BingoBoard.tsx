@@ -6,11 +6,11 @@ import Link from "next/link";
 
 import { getTileImageUrl, resolveStoredImageUrl } from "@/lib/images";
 import { getTileDisplayName, parseTileAcceptedDrops } from "@/lib/types";
-import type { Team, TileWithProgress } from "@/lib/types";
+import type { TeamWithPlayers, TileWithProgress } from "@/lib/types";
 
 interface BingoBoardProps {
   tiles: TileWithProgress[];
-  team: Team;
+  team: TeamWithPlayers;
   teamIndex: 0 | 1;
 }
 
@@ -137,6 +137,11 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
           <div>
             <h2 className="text-2xl">{team.name}</h2>
             <p className="text-sm text-osrs-text-muted">{completeCount}/25 tiles complete</p>
+            {team.players.length > 0 && (
+              <p className="mt-0.5 text-xs text-osrs-text-muted">
+                {team.players.map((p) => p.username).join(" · ")}
+              </p>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <Link href={`/log-drop?team=${team.id}`} className="osrs-button text-sm">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import BingoBoard from "@/components/BingoBoard";
 import StartCountdown from "@/components/StartCountdown";
 import { getEnv } from "@/lib/cloudflare";
-import { computeAllTilesProgress, getGame, getTeamById, getTeams, getTiles } from "@/lib/db";
+import { computeAllTilesProgress, getGame, getPlayers, getTeamById, getTeams, getTiles } from "@/lib/db";
 import { performStart } from "@/lib/game";
 
 function StatusBanner({
@@ -75,12 +75,15 @@ export default async function HomePage() {
     game = await getGame(env.DB);
   }
 
-  const [teams, tiles] = await Promise.all([getTeams(env.DB), getTiles(env.DB)]);
+  const [teams, tiles, players] = await Promise.all([getTeams(env.DB), getTiles(env.DB), getPlayers(env.DB)]);
 
   const orderedTeams = [
     teams.find((team) => team.id === 1) ?? teams[0],
     teams.find((team) => team.id === 2) ?? teams[1],
-  ].filter(Boolean);
+  ].filter(Boolean).map((team) => ({
+    ...team,
+    players: players.filter((p) => p.team_id === team.id),
+  }));
   const progress = await computeAllTilesProgress(env.DB, tiles);
   const winner = game.winner_team_id ? await getTeamById(env.DB, game.winner_team_id) : null;
 
@@ -106,7 +109,11 @@ export default async function HomePage() {
         setupError={autoStartError}
       />
 
-      {orderedTeams.length === 2 && progress.length > 0 ? (
+      {game.status === "setup" ? (
+        <div className="osrs-panel p-8 text-center text-osrs-text-muted">
+          🏆 The boards will be revealed when the competition starts. Stay tuned!
+        </div>
+      ) : orderedTeams.length === 2 && progress.length > 0 ? (
         <div className="grid gap-6 xl:grid-cols-2">
           {orderedTeams.map((team, index) => (
             <BingoBoard key={team.id} tiles={progress} team={team} teamIndex={index as 0 | 1} />
