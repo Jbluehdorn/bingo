@@ -773,8 +773,11 @@ export default function AdminPage() {
                 <div className="flex flex-col gap-2">
                   <span className="font-semibold">Type <span className="text-red-400">*</span></span>
                   <div className="flex gap-4">
-                    <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "drop"} onChange={() => setTileEditor((current) => ({ ...current, type: "drop" }))} />Drop</label>
-                    <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "xp"} onChange={() => setTileEditor((current) => ({ ...current, type: "xp" }))} />XP</label>
+                    <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "drop"} onChange={() => setTileEditor((current) => ({ ...current, type: "drop", display_title: "" }))} />Drop</label>
+                    <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "xp"} onChange={() => setTileEditor((current) => {
+                      const capitalized = current.skill_name.charAt(0).toUpperCase() + current.skill_name.slice(1);
+                      return { ...current, type: "xp", display_title: `${capitalized} XP` };
+                    })} />XP</label>
                   </div>
                 </div>
 
@@ -862,18 +865,28 @@ export default function AdminPage() {
                   </>
                 ) : (
                   <>
-                    <div className="flex gap-3">
-                      <label className="flex flex-1 flex-col gap-2">
-                        <span className="font-semibold">Skill <span className="text-red-400">*</span></span>
-                        <select className="osrs-input" value={tileEditor.skill_name} onChange={(event) => setTileEditor((current) => ({ ...current, skill_name: event.target.value }))}>
-                          {OSRS_SKILLS.map((skill) => <option key={skill} value={skill}>{skill}</option>)}
-                        </select>
-                      </label>
-                      <label className="flex flex-1 flex-col gap-2">
-                        <span className="font-semibold">Required XP Gained <span className="text-red-400">*</span></span>
-                        <input className="osrs-input" type="number" min={1} value={tileEditor.required_xp} onChange={(event) => setTileEditor((current) => ({ ...current, required_xp: Number(event.target.value) }))} />
-                      </label>
-                    </div>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Skill <span className="text-red-400">*</span></span>
+                      <select className="osrs-input" value={tileEditor.skill_name} onChange={(event) => {
+                        const skill = event.target.value;
+                        const capitalized = skill.charAt(0).toUpperCase() + skill.slice(1);
+                        setTileEditor((current) => ({
+                          ...current,
+                          skill_name: skill,
+                          display_title: `${capitalized} XP`,
+                        }));
+                      }}>
+                        {OSRS_SKILLS.map((skill) => (
+                          <option key={skill} value={skill}>
+                            {skill.charAt(0).toUpperCase() + skill.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Required XP Gained <span className="text-red-400">*</span></span>
+                      <input className="osrs-input" type="number" min={1} value={tileEditor.required_xp} onChange={(event) => setTileEditor((current) => ({ ...current, required_xp: Number(event.target.value) }))} />
+                    </label>
                   </>
                 )}
 
