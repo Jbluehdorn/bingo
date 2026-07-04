@@ -428,6 +428,13 @@ export default function AdminPage() {
   async function handleDeleteTile() {
     if (!tileEditor.id) return;
 
+    // Cancel any pending autosave before deleting so it can't race and restore the tile.
+    if (autoSaveTimer.current) {
+      clearTimeout(autoSaveTimer.current);
+      autoSaveTimer.current = null;
+    }
+    setAutoSaveStatus("idle");
+
     await runAction(async () => {
       const response = await fetch(`/api/tiles/${tileEditor.id}`, { method: "DELETE" });
       const payload = (await response.json()) as { error?: string; message?: string };
