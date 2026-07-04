@@ -71,9 +71,13 @@ function BoardMiniTile({
 
       {/* Accepted drops tooltip — only shown for drop tiles with configured drops */}
       {tile.type === "drop" && acceptedDrops.length > 0 && (
-        <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded border border-osrs-border bg-osrs-panel p-2 text-xs opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
-          <div className="mb-1.5 font-semibold text-osrs-text-bright">Accepted Drops</div>
-          <ul className="flex flex-col gap-0.5">
+        <div className={`pointer-events-auto absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded border border-osrs-border bg-osrs-panel p-2 text-xs opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100 ${
+          acceptedDrops.length > 8 ? "w-72" : "w-56"
+        }`}>
+          <div className="mb-1.5 font-semibold text-osrs-text-bright">
+            Accepted Drops <span className="font-normal text-osrs-text-muted">({acceptedDrops.length})</span>
+          </div>
+          <ul className={`max-h-52 overflow-y-auto ${acceptedDrops.length > 8 ? "grid grid-cols-2 gap-x-2" : "flex flex-col"} gap-y-0.5`}>
             {acceptedDrops.map((drop) => (
               <li key={drop} className="text-osrs-text">• {drop}</li>
             ))}
