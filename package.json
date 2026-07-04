@@ -10,8 +10,8 @@
     "preview": "opennextjs-cloudflare build && wrangler dev .open-next/worker.js",
     "deploy": "opennextjs-cloudflare build && wrangler pages deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
-    "db:migrate:local": "wrangler d1 execute bingo-db --local --file=migrations/0001_initial.sql",
-    "db:migrate:remote": "wrangler d1 execute bingo-db --remote --file=migrations/0001_initial.sql",
+    "db:migrate:local": "wrangler d1 migrations apply bingo-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply bingo-db --remote",
     "db:reset:local": "if exist .wrangler (rd /s /q .wrangler) && npm run db:migrate:local"
   },
   "dependencies": {
