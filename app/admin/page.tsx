@@ -862,16 +862,18 @@ export default function AdminPage() {
                   </>
                 ) : (
                   <>
-                    <label className="flex flex-col gap-2">
-                      <span className="font-semibold">Skill <span className="text-red-400">*</span></span>
-                      <select className="osrs-input" value={tileEditor.skill_name} onChange={(event) => setTileEditor((current) => ({ ...current, skill_name: event.target.value }))}>
-                        {OSRS_SKILLS.map((skill) => <option key={skill} value={skill}>{skill}</option>)}
-                      </select>
-                    </label>
-                    <label className="flex flex-col gap-2">
-                      <span className="font-semibold">Required XP <span className="text-red-400">*</span></span>
-                      <input className="osrs-input" type="number" min={1} value={tileEditor.required_xp} onChange={(event) => setTileEditor((current) => ({ ...current, required_xp: Number(event.target.value) }))} />
-                    </label>
+                    <div className="flex gap-3">
+                      <label className="flex flex-1 flex-col gap-2">
+                        <span className="font-semibold">Skill <span className="text-red-400">*</span></span>
+                        <select className="osrs-input" value={tileEditor.skill_name} onChange={(event) => setTileEditor((current) => ({ ...current, skill_name: event.target.value }))}>
+                          {OSRS_SKILLS.map((skill) => <option key={skill} value={skill}>{skill}</option>)}
+                        </select>
+                      </label>
+                      <label className="flex flex-1 flex-col gap-2">
+                        <span className="font-semibold">Required XP Gained <span className="text-red-400">*</span></span>
+                        <input className="osrs-input" type="number" min={1} value={tileEditor.required_xp} onChange={(event) => setTileEditor((current) => ({ ...current, required_xp: Number(event.target.value) }))} />
+                      </label>
+                    </div>
                   </>
                 )}
 
