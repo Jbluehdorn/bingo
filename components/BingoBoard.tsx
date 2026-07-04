@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,26 +18,151 @@ function formatNumber(value: number): string {
   return value.toLocaleString();
 }
 
+interface ModalProps {
+  entry: TileWithProgress;
+  progress: TileWithProgress["team1"];
+  progressText: string;
+  teamId: number;
+  onClose: () => void;
+}
+
+function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProps) {
+  const { tile } = entry;
+  const initialSrc = useMemo(() => resolveStoredImageUrl(getTileImageUrl(tile)), [tile]);
+  const [imageSrc, setImageSrc] = useState(initialSrc);
+  const acceptedDrops = useMemo(() => parseTileAcceptedDrops(tile), [tile]);
+  const displayName = getTileDisplayName(tile);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  // Prevent body scroll while modal is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md overflow-hidden rounded border border-osrs-border bg-osrs-panel shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className={`flex items-center gap-4 p-4 ${progress.is_complete ? "bg-osrs-green/30" : "bg-osrs-panel-dark"}`}>
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded border border-osrs-border bg-osrs-panel-dark">
+            {imageSrc ? (
+              <Image src={imageSrc} alt={displayName} fill sizes="80px" className="object-contain p-1" unoptimized onError={() => setImageSrc("")} />
+            ) : (
+              <div className="flex h-full items-center justify-center text-3xl">🎯</div>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-osrs-text-muted">#{tile.position}</span>
+              <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${tile.type === "drop" ? "bg-osrs-border text-osrs-text" : "bg-blue-900 text-blue-200"}`}>
+                {tile.type}
+              </span>
+              {progress.is_complete && (
+                <span className="rounded bg-osrs-green/60 px-1.5 py-0.5 text-[10px] font-semibold text-green-200">✓ Complete</span>
+              )}
+              {progress.pet_completed && (
+                <span className="rounded bg-yellow-700 px-1.5 py-0.5 text-[10px] text-yellow-100">🐾 Pet!</span>
+              )}
+            </div>
+            <h3 className="mt-1 text-lg font-semibold text-osrs-text-bright">{displayName}</h3>
+            <p className="text-sm text-osrs-text">{progressText}</p>
+          </div>
+          <button type="button" onClick={onClose} className="shrink-0 self-start text-osrs-text-muted hover:text-osrs-text-bright text-xl leading-none">✕</button>
+        </div>
+
+        {/* Body */}
+        <div className="max-h-[60vh] overflow-y-auto p-4 flex flex-col gap-4">
+          {/* Contributors */}
+          {progress.contributors.length > 0 && (
+            <div>
+              <div className="mb-2 text-sm font-semibold text-osrs-text-bright">
+                Drops Logged <span className="font-normal text-osrs-text-muted">({progress.contributors.length})</span>
+              </div>
+              <ol className="flex flex-col gap-1">
+                {progress.contributors.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm">
+                    <span className="w-5 shrink-0 text-center text-xs text-osrs-text-muted">{i + 1}.</span>
+                    <span className="text-osrs-text">{name}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Accepted drops */}
+          {tile.type === "drop" && acceptedDrops.length > 0 && (
+            <div>
+              <div className="mb-2 text-sm font-semibold text-osrs-text-bright">
+                Accepted Drops <span className="font-normal text-osrs-text-muted">({acceptedDrops.length})</span>
+              </div>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-1">
+                {acceptedDrops.map((drop) => (
+                  <li key={drop} className="text-xs text-osrs-text">• {drop}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {tile.type === "drop" && acceptedDrops.length === 0 && progress.contributors.length === 0 && (
+            <p className="text-sm text-osrs-text-muted">No drops logged yet.</p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t border-osrs-border p-4">
+          <Link
+            href={`/log-drop?team=${teamId}`}
+            className="osrs-button text-sm"
+            onClick={onClose}
+          >
+            Log a Drop
+          </Link>
+          <button type="button" onClick={onClose} className="text-sm text-osrs-text-muted hover:text-osrs-text">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BoardMiniTile({
   tile,
   isComplete,
   progressText,
   petCompleted,
   contributors,
+  onClick,
 }: {
   tile: TileWithProgress["tile"];
   isComplete: boolean;
   progressText: string;
   petCompleted: boolean;
   contributors: string[];
+  onClick: () => void;
 }) {
   const initialSrc = useMemo(() => resolveStoredImageUrl(getTileImageUrl(tile)), [tile]);
   const [imageSrc, setImageSrc] = useState(initialSrc);
-  const acceptedDrops = useMemo(() => parseTileAcceptedDrops(tile), [tile]);
 
   return (
-    <div
-      className={`group relative flex min-h-34 flex-col gap-2 rounded border p-2 ${
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative flex min-h-34 w-full cursor-pointer flex-col gap-2 rounded border p-2 text-left transition-opacity hover:opacity-80 ${
         isComplete
           ? "border-osrs-green-border bg-osrs-green/80"
           : "border-osrs-red-border bg-osrs-red/70"
@@ -65,7 +190,7 @@ function BoardMiniTile({
         </div>
         <div className="text-[11px] text-osrs-text">{progressText}</div>
         {contributors.length > 0 && (
-          <div className="truncate text-[10px] text-osrs-text-muted" title={contributors.join(", ")}>
+          <div className="truncate text-[10px] text-osrs-text-muted">
             {contributors.join(", ")}
           </div>
         )}
@@ -75,26 +200,7 @@ function BoardMiniTile({
           </span>
         ) : null}
       </div>
-
-      {/* Accepted drops tooltip — only shown for drop tiles with configured drops */}
-      {tile.type === "drop" && acceptedDrops.length > 0 && (
-        <div className={`pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded border border-osrs-border bg-osrs-panel p-2 text-xs opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100 ${
-          acceptedDrops.length > 8 ? "w-72" : "w-56"
-        }`}>
-          <div className="mb-1.5 font-semibold text-osrs-text-bright">
-            Accepted Drops <span className="font-normal text-osrs-text-muted">({acceptedDrops.length})</span>
-          </div>
-          <ul className={`${acceptedDrops.length > 8 ? "grid grid-cols-2 gap-x-2" : "flex flex-col"} gap-y-0.5`}>
-            {acceptedDrops.slice(0, 20).map((drop) => (
-              <li key={drop} className="text-osrs-text">• {drop}</li>
-            ))}
-          </ul>
-          {acceptedDrops.length > 20 && (
-            <div className="mt-1 text-osrs-text-muted">+{acceptedDrops.length - 20} more…</div>
-          )}
-        </div>
-      )}
-    </div>
+    </button>
   );
 }
 
@@ -107,6 +213,7 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
     if (typeof window === "undefined") return false;
     return localStorage.getItem(storageKey) === "true";
   });
+  const [selectedEntry, setSelectedEntry] = useState<TileWithProgress | null>(null);
 
   function toggle() {
     setCollapsed((prev) => {
@@ -175,10 +282,25 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
                 progressText={progressText}
                 petCompleted={progress.pet_completed}
                 contributors={progress.contributors}
-            />
-          );
-        })}
+                onClick={() => setSelectedEntry(entry)}
+              />
+            );
+          })}
         </div>
+      )}
+
+      {selectedEntry && (
+        <TileModal
+          entry={selectedEntry}
+          progress={teamIndex === 0 ? selectedEntry.team1 : selectedEntry.team2}
+          progressText={
+            selectedEntry.tile.type === "drop"
+              ? `${(teamIndex === 0 ? selectedEntry.team1 : selectedEntry.team2).current_drops}/${selectedEntry.tile.required_drops ?? 0} drops`
+              : `${formatNumber((teamIndex === 0 ? selectedEntry.team1 : selectedEntry.team2).current_xp)} / ${formatNumber(selectedEntry.tile.required_xp ?? 0)} xp gained`
+          }
+          teamId={team.id}
+          onClose={() => setSelectedEntry(null)}
+        />
       )}
     </section>
   );
