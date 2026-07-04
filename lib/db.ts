@@ -210,9 +210,11 @@ export async function computeAllTilesProgress(
       if (tile.type === "xp" && tile.skill_name) {
         const skillName = tile.skill_name.toLowerCase();
         currentXp = (teamPlayers.get(teamId) ?? []).reduce((total, player) => {
+          const baselineRaw = snapshotMap.get(`${player.id}:${skillName}`);
+          // No snapshot means the competition hasn't started yet for this skill — contribute 0.
+          if (baselineRaw === undefined) return total;
           const current = Number(xpByPlayer.get(player.id)?.[skillName] ?? 0);
-          const baseline = Number(snapshotMap.get(`${player.id}:${skillName}`) ?? 0);
-          return total + Math.max(0, current - baseline);
+          return total + Math.max(0, current - Number(baselineRaw));
         }, 0);
       }
 
