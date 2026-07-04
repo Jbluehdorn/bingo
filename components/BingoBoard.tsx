@@ -23,11 +23,13 @@ function BoardMiniTile({
   isComplete,
   progressText,
   petCompleted,
+  contributors,
 }: {
   tile: TileWithProgress["tile"];
   isComplete: boolean;
   progressText: string;
   petCompleted: boolean;
+  contributors: string[];
 }) {
   const initialSrc = useMemo(() => resolveStoredImageUrl(getTileImageUrl(tile)), [tile]);
   const [imageSrc, setImageSrc] = useState(initialSrc);
@@ -62,6 +64,11 @@ function BoardMiniTile({
           {getTileDisplayName(tile)}
         </div>
         <div className="text-[11px] text-osrs-text">{progressText}</div>
+        {contributors.length > 0 && (
+          <div className="truncate text-[10px] text-osrs-text-muted" title={contributors.join(", ")}>
+            {contributors.join(", ")}
+          </div>
+        )}
         {petCompleted ? (
           <span className="mt-1 inline-block rounded bg-yellow-700 px-1.5 py-0.5 text-[10px] text-yellow-100">
             🐾 Pet!
@@ -140,6 +147,7 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
               isComplete={progress.is_complete}
               progressText={progressText}
               petCompleted={progress.pet_completed}
+              contributors={progress.contributors}
             />
           );
         })}

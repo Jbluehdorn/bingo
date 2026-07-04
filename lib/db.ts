@@ -127,6 +127,7 @@ function buildEmptyProgress(teamId: number): TeamTileProgress {
     pet_completed: false,
     current_drops: 0,
     current_xp: 0,
+    contributors: [],
   };
 }
 
@@ -166,9 +167,15 @@ export async function computeAllTilesProgress(
   }
 
   const dropCountMap = new Map<string, number>();
+  const dropContributorsMap = new Map<string, Set<string>>();
   for (const drop of drops) {
     const key = `${drop.tile_id}:${drop.team_id}`;
     dropCountMap.set(key, (dropCountMap.get(key) ?? 0) + 1);
+    const player = players.find((p) => p.id === drop.player_id);
+    if (player) {
+      if (!dropContributorsMap.has(key)) dropContributorsMap.set(key, new Set());
+      dropContributorsMap.get(key)!.add(player.username);
+    }
   }
 
   const petSet = new Set(petCompletions.map((item) => `${item.tile_id}:${item.team_id}`));
@@ -218,6 +225,7 @@ export async function computeAllTilesProgress(
         pet_completed: petCompleted,
         current_drops: currentDrops,
         current_xp: currentXp,
+        contributors: Array.from(dropContributorsMap.get(`${tile.id}:${teamId}`) ?? []),
       };
     };
 

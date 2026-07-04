@@ -137,4 +137,5 @@ export interface TeamTileProgress {
   pet_completed: boolean;
   current_drops: number;
   current_xp: number;
+  contributors: string[]; // usernames of players who logged drops for this tile
 }
