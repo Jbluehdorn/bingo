@@ -3,46 +3,67 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 import BingoBoard from "@/components/BingoBoard";
+import StartCountdown from "@/components/StartCountdown";
 import { getEnv } from "@/lib/cloudflare";
 import { computeAllTilesProgress, getGame, getTeamById, getTeams, getTiles } from "@/lib/db";
+import { performStart } from "@/lib/game";
 
 function StatusBanner({
   status,
   winnerName,
+  scheduledStartAt,
 }: {
   status: "setup" | "active" | "completed";
   winnerName?: string | null;
+  scheduledStartAt?: string | null;
 }) {
-  const config =
-    status === "setup"
-      ? {
-          className: "border-osrs-border bg-osrs-panel",
-          text: "Waiting for admin to start",
-        }
-      : status === "active"
-        ? {
-            className: "border-osrs-green-border bg-osrs-green/70",
-            text: "Competition is LIVE!",
-          }
-        : {
-            className: "border-yellow-600 bg-yellow-950/70",
-            text: `🏆 ${winnerName ?? "A team"} wins!`,
-          };
+  if (status === "active") {
+    return (
+      <div className="rounded border border-osrs-green-border bg-osrs-green/70 px-4 py-3 text-center font-semibold">
+        Competition is LIVE!
+      </div>
+    );
+  }
+
+  if (status === "completed") {
+    return (
+      <div className="rounded border border-yellow-600 bg-yellow-950/70 px-4 py-3 text-center font-semibold">
+        🏆 {winnerName ?? "A team"} wins!
+      </div>
+    );
+  }
+
+  // setup
+  if (scheduledStartAt) {
+    return (
+      <div className="rounded border border-osrs-border bg-osrs-panel px-4 py-3 text-center font-semibold">
+      <StartCountdown targetUtc={scheduledStartAt} />
+      </div>
+    );
+  }
 
   return (
-    <div className={`rounded border px-4 py-3 text-center font-semibold ${config.className}`}>
-      {config.text}
+    <div className="rounded border border-osrs-border bg-osrs-panel px-4 py-3 text-center font-semibold">
+      Waiting for admin to start
     </div>
   );
 }
 
 export default async function HomePage() {
   const env = await getEnv();
-  const [game, teams, tiles] = await Promise.all([
-    getGame(env.DB),
-    getTeams(env.DB),
-    getTiles(env.DB),
-  ]);
+  let game = await getGame(env.DB);
+
+  // Auto-transition: if scheduled start has passed and game is still in setup, trigger start.
+  if (
+    game.status === "setup" &&
+    game.scheduled_start_at &&
+    new Date(game.scheduled_start_at) <= new Date()
+  ) {
+    await performStart(env.DB);
+    game = await getGame(env.DB);
+  }
+
+  const [teams, tiles] = await Promise.all([getTeams(env.DB), getTiles(env.DB)]);
 
   const orderedTeams = [
     teams.find((team) => team.id === 1) ?? teams[0],
@@ -60,7 +81,11 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <StatusBanner status={game.status} winnerName={winner?.name} />
+      <StatusBanner
+        status={game.status}
+        winnerName={winner?.name}
+        scheduledStartAt={game.scheduled_start_at}
+      />
 
       {orderedTeams.length === 2 && progress.length > 0 ? (
         <div className="grid gap-6 xl:grid-cols-2">

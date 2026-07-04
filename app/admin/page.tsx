@@ -68,6 +68,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"Game" | "Teams" | "Tiles" | "Drops" | "Pets">("Game");
+  const [scheduledInput, setScheduledInput] = useState(""); // datetime-local value (local tz)
 
   async function fetchAdminData() {
     const [gameResponse, tilesResponse, dropsResponse] = await Promise.all([
@@ -98,6 +99,15 @@ export default function AdminPage() {
     setDropRows(data.drops);
     setTeamNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.name])));
     setPetTeamId(data.gamePayload.teams[0]?.id ?? 1);
+    // Pre-fill the schedule input if a schedule already exists
+    if (data.gamePayload.game.scheduled_start_at) {
+      const d = new Date(data.gamePayload.game.scheduled_start_at);
+      // datetime-local format: YYYY-MM-DDTHH:MM
+      const pad = (n: number) => String(n).padStart(2, "0");
+      setScheduledInput(
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
+      );
+    }
   }
 
   useEffect(() => {
@@ -329,6 +339,35 @@ export default function AdminPage() {
     });
   }
 
+  async function handleScheduleStart() {
+    if (!scheduledInput) {
+      setError("Please select a date and time.");
+      return;
+    }
+    // Convert the local datetime-input value to a UTC ISO string.
+    const utc = new Date(scheduledInput).toISOString();
+    await runAction(async () => {
+      const response = await fetch("/api/game/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scheduled_start_at: utc }),
+      });
+      const payload = (await response.json()) as { error?: string; message?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Failed to schedule start.");
+      setMessage(payload.message ?? "Start time scheduled.");
+    });
+  }
+
+  async function handleClearSchedule() {
+    await runAction(async () => {
+      const response = await fetch("/api/game/schedule", { method: "DELETE" });
+      const payload = (await response.json()) as { error?: string; message?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Failed to clear schedule.");
+      setScheduledInput("");
+      setMessage(payload.message ?? "Schedule cleared.");
+    });
+  }
+
   async function handleResetGame() {
     if (!window.confirm("Reset the entire bingo game? This clears players, tiles, drops, and snapshots.")) {
       return;
@@ -398,20 +437,96 @@ export default function AdminPage() {
       {activeTab === "Game" && (
         <div className="osrs-panel flex flex-col gap-4 p-6">
           <h2 className="text-xl font-semibold text-osrs-text-bright">Game Management</h2>
+
           <div className="inline-flex w-fit rounded border border-osrs-border bg-osrs-panel-dark px-3 py-2 font-semibold capitalize">
             Status: {gameData?.game.status}
           </div>
-          {gameData?.game.started_at ? <div className="text-sm text-osrs-text-muted">Competition started at: {gameData.game.started_at}</div> : null}
-          {gameData?.game.status === "completed" ? <div className="text-sm text-osrs-text-muted">Winner: {gameData.winnerName ?? "Unknown"}</div> : null}
+
+          {gameData?.game.started_at ? (
+            <div className="text-sm text-osrs-text-muted">
+              Competition started at:{" "}
+              <span className="text-osrs-text">
+                {new Date(gameData.game.started_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+              </span>
+            </div>
+          ) : null}
+
+          {gameData?.game.status === "completed" ? (
+            <div className="text-sm text-osrs-text-muted">Winner: {gameData.winnerName ?? "Unknown"}</div>
+          ) : null}
+
+          {/* Schedule start — only when game is in setup */}
+          {gameData?.game.status === "setup" && (
+            <div className="flex flex-col gap-3 rounded border border-osrs-border bg-osrs-panel-dark p-4">
+              <h3 className="font-semibold text-osrs-text-bright">Schedule Start Time</h3>
+
+              {gameData.game.scheduled_start_at ? (
+                <div className="text-sm text-osrs-text-muted">
+                  Currently scheduled:{" "}
+                  <span className="font-semibold text-osrs-text">
+                    {new Date(gameData.game.scheduled_start_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+                  </span>{" "}
+                  (your local time)
+                </div>
+              ) : null}
+
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-osrs-text-muted">Date &amp; time (your local timezone)</label>
+                  <input
+                    type="datetime-local"
+                    className="osrs-input"
+                    value={scheduledInput}
+                    onChange={(e) => setScheduledInput(e.target.value)}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="osrs-button"
+                  onClick={() => void handleScheduleStart()}
+                  disabled={saving || !scheduledInput}
+                >
+                  {gameData.game.scheduled_start_at ? "Update Schedule" : "Schedule Start"}
+                </button>
+                {gameData.game.scheduled_start_at ? (
+                  <button
+                    type="button"
+                    className="osrs-button border-osrs-border !bg-osrs-panel-dark"
+                    onClick={() => void handleClearSchedule()}
+                    disabled={saving}
+                  >
+                    Clear Schedule
+                  </button>
+                ) : null}
+              </div>
+
+              <p className="text-xs text-osrs-text-muted">
+                The competition will automatically start when the scheduled time is reached. Viewers will see a countdown.
+              </p>
+
+              <hr className="border-osrs-border" />
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  className="osrs-button"
+                  onClick={() => void handleStartCompetition()}
+                  disabled={saving || (gameData?.tileCount ?? 0) !== 25}
+                >
+                  Start Now
+                </button>
+              </div>
+              <p className="text-xs text-osrs-text-muted">
+                You need 25 configured tiles and at least one player per team before starting.
+              </p>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-3">
-            <button type="button" className="osrs-button" onClick={() => void handleStartCompetition()} disabled={saving || gameData?.game.status !== "setup" || (gameData?.tileCount ?? 0) !== 25}>
-              Start Competition
-            </button>
             <button type="button" className="osrs-button border-red-800 !bg-red-900" onClick={() => void handleResetGame()} disabled={saving}>
               Reset Game
             </button>
           </div>
-          <div className="text-sm text-osrs-text-muted">You need 25 configured tiles and at least one player per team before starting.</div>
         </div>
       )}
 
