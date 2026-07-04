@@ -90,7 +90,6 @@
     "group": "God Wars Dungeon",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Kree%27arra.png/200px-Kree%27arra.png?ba75c",
     "drops": [
-      "Pet kree'arra",
       "Armadyl helmet",
       "Armadyl chestplate",
       "Armadyl chainskirt",
@@ -107,7 +106,6 @@
     "group": "God Wars Dungeon",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Commander_Zilyana.png/200px-Commander_Zilyana.png?c5eaa",
     "drops": [
-      "Pet zilyana",
       "Armadyl crossbow",
       "Saradomin hilt",
       "Saradomin sword",
@@ -124,7 +122,6 @@
     "group": "God Wars Dungeon",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/General_Graardor.png/200px-General_Graardor.png?4dd90",
     "drops": [
-      "Pet general graardor",
       "Bandos chestplate",
       "Bandos tassets",
       "Bandos boots",
@@ -141,7 +138,6 @@
     "group": "God Wars Dungeon",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/K%27ril_Tsutsaroth.png/200px-K%27ril_Tsutsaroth.png?73bda",
     "drops": [
-      "Pet k'ril tsutsaroth",
       "Staff of the dead",
       "Zamorakian spear",
       "Steam battlestaff",
@@ -158,7 +154,6 @@
     "group": "Dagannoth Kings",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dagannoth_Supreme.png/200px-Dagannoth_Supreme.png?81f00",
     "drops": [
-      "Pet dagannoth supreme",
       "Archers ring",
       "Dragon axe",
       "Seercull"
@@ -171,7 +166,6 @@
     "group": "Dagannoth Kings",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dagannoth_Rex.png/200px-Dagannoth_Rex.png?a99a9",
     "drops": [
-      "Pet dagannoth rex",
       "Berserker ring",
       "Warrior ring",
       "Dragon axe"
@@ -184,7 +178,6 @@
     "group": "Dagannoth Kings",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dagannoth_Prime.png/200px-Dagannoth_Prime.png?945b1",
     "drops": [
-      "Pet dagannoth prime",
       "Seers ring",
       "Dragon axe",
       "Mud battlestaff"
@@ -200,8 +193,7 @@
       "Blood moon helm",
       "Blood moon chestplate",
       "Blood moon tassets",
-      "Dual macuahuitl",
-      "Atlatl dart"
+      "Dual macuahuitl"
     ]
   },
   {
@@ -214,8 +206,7 @@
       "Blue moon helm",
       "Blue moon chestplate",
       "Blue moon tassets",
-      "Blue moon spear",
-      "Atlatl dart"
+      "Blue moon spear"
     ]
   },
   {
@@ -228,8 +219,7 @@
       "Eclipse moon helm",
       "Eclipse moon chestplate",
       "Eclipse moon tassets",
-      "Eclipse atlatl",
-      "Atlatl dart"
+      "Eclipse atlatl"
     ]
   },
   {
@@ -246,9 +236,7 @@
       "Awakener's orb",
       "Magus vestige",
       "Eye of the duke",
-      "Ice quartz",
-      "Frozen tablet",
-      "Baron"
+      "Ice quartz"
     ]
   },
   {
@@ -265,9 +253,7 @@
       "Awakener's orb",
       "Venator vestige",
       "Leviathan's lure",
-      "Smoke quartz",
-      "Scarred tablet",
-      "Lil'viathan"
+      "Smoke quartz"
     ]
   },
   {
@@ -284,9 +270,7 @@
       "Awakener's orb",
       "Bellator vestige",
       "Siren's staff",
-      "Shadow quartz",
-      "Sirenic tablet",
-      "Wisp"
+      "Shadow quartz"
     ]
   },
   {
@@ -303,9 +287,7 @@
       "Awakener's orb",
       "Ultor vestige",
       "Executioner's axe head",
-      "Blood quartz",
-      "Strangled tablet",
-      "Butch"
+      "Blood quartz"
     ]
   },
   {
@@ -368,16 +350,11 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Zulrah_%28serpentine%29.png/200px-Zulrah_%28serpentine%29.png?29a54",
     "drops": [
-      "Pet snakeling",
       "Tanzanite mutagen",
       "Magma mutagen",
-      "Jar of swamp",
       "Magic fang",
       "Serpentine visage",
-      "Tanzanite fang",
-      "Zul-andra teleport",
-      "Uncut onyx",
-      "Zulrah's scales"
+      "Tanzanite fang"
     ]
   },
   {
@@ -387,11 +364,9 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Vorkath.png/200px-Vorkath.png?1ce3f",
     "drops": [
-      "Vorki",
       "Vorkath's head",
       "Draconic visage",
       "Skeletal visage",
-      "Jar of decay",
       "Dragonbone necklace"
     ]
   },
@@ -402,7 +377,6 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/The_Nightmare.png/200px-The_Nightmare.png?0128a",
     "drops": [
-      "Little nightmare",
       "Inquisitor's mace",
       "Inquisitor's great helm",
       "Inquisitor's hauberk",
@@ -411,9 +385,7 @@
       "Volatile orb",
       "Harmonised orb",
       "Eldritch orb",
-      "Jar of dreams",
-      "Slepey tablet",
-      "Parasitic egg"
+      "Slepey tablet"
     ]
   },
   {
@@ -423,12 +395,8 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Phantom_Muspah_%28ranged%29.png/200px-Phantom_Muspah_%28ranged%29.png?9cf6a",
     "drops": [
-      "Muphin",
       "Venator shard",
-      "Ancient icon",
-      "Charged ice",
-      "Frozen cache",
-      "Ancient essence"
+      "Ancient icon"
     ]
   },
   {
@@ -438,17 +406,13 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Yama.png/200px-Yama.png?7653a",
     "drops": [
-      "Yami",
       "Soulflame horn",
       "Oathplate helm",
       "Oathplate chest",
       "Oathplate legs",
-      "Oathplate shards",
       "Barrel of demonic tallow",
       "Forgotten lockbox",
-      "Dossier",
-      "Diabolic worms",
-      "Chasm teleport scroll"
+      "Dossier"
     ]
   },
   {
@@ -478,7 +442,6 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Amoxliatl.png/200px-Amoxliatl.png?01b12",
     "drops": [
-      "Moxi",
       "Glacial temotli",
       "Pendant of ates (inert)",
       "Frozen tear"
@@ -491,7 +454,6 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Eldric_the_Ice_King.png/200px-Eldric_the_Ice_King.png?6bd48",
     "drops": [
-      "Bran",
       "Deadeye prayer scroll",
       "Mystic vigour prayer scroll",
       "Fire element staff crown",
@@ -507,7 +469,6 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Doom_of_Mokhaiotl.png/200px-Doom_of_Mokhaiotl.png?e5edb",
     "drops": [
-      "Dom",
       "Avernic treads",
       "Eye of ayak (uncharged)",
       "Mokhaiotl cloth",
@@ -522,7 +483,6 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Corporeal_Beast.png/200px-Corporeal_Beast.png?52ebb",
     "drops": [
-      "Pet dark core",
       "Elysian sigil",
       "Arcane sigil",
       "Spectral sigil",
@@ -537,9 +497,7 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Kalphite_Queen.png/200px-Kalphite_Queen.png?a4955",
     "drops": [
-      "Kalphite princess",
       "Kq head",
-      "Jar of sand",
       "Dragon 2h sword",
       "Dragon chainbody",
       "Dragon pickaxe"
@@ -552,8 +510,6 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Sarachnis.png/200px-Sarachnis.png?8f040",
     "drops": [
-      "Sraracha",
-      "Jar of eyes",
       "Giant egg sac",
       "Sarachnis cudgel",
       "Pristine spider silk"
@@ -566,8 +522,7 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Scurrius.png/200px-Scurrius.png?e66a5",
     "drops": [
-      "Scurrius' spine",
-      "Scurry"
+      "Scurrius' spine"
     ]
   },
   {
@@ -577,10 +532,7 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Giant_Mole.png/200px-Giant_Mole.png?3f58a",
     "drops": [
-      "Baby mole",
-      "Immaculate mole skin",
-      "Mole skin",
-      "Mole claw"
+      "Immaculate mole skin"
     ]
   },
   {
@@ -590,12 +542,9 @@
     "group": null,
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/The_Hueycoatl.png/200px-The_Hueycoatl.png?7b216",
     "drops": [
-      "Huberte",
       "Dragon hunter wand",
       "Hueycoatl hide",
-      "Tome of earth (empty)",
-      "Soiled page",
-      "Huasca seed"
+      "Tome of earth (empty)"
     ]
   },
   {
@@ -605,7 +554,6 @@
     "group": "Wilderness",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Chaos_Fanatic.png/200px-Chaos_Fanatic.png?8871d",
     "drops": [
-      "Pet chaos elemental",
       "Odium shard 1",
       "Malediction shard 1"
     ]
@@ -629,7 +577,6 @@
     "group": "Wilderness",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Scorpia.png/200px-Scorpia.png?517c9",
     "drops": [
-      "Scorpia's offspring",
       "Odium shard 3",
       "Malediction shard 3",
       "Dragon 2h sword"
@@ -642,7 +589,6 @@
     "group": "Wilderness",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/King_Black_Dragon.png/200px-King_Black_Dragon.png?d25f0",
     "drops": [
-      "Prince black dragon",
       "Kbd heads",
       "Dragon pickaxe",
       "Draconic visage"
@@ -655,7 +601,6 @@
     "group": "Wilderness",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Chaos_Elemental.png/200px-Chaos_Elemental.png?c170c",
     "drops": [
-      "Pet chaos elemental",
       "Dragon pickaxe",
       "Dragon 2h sword"
     ]
@@ -681,7 +626,6 @@
     "group": "Wilderness",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Calvar%27ion.png/200px-Calvar%27ion.png?6268f",
     "drops": [
-      "Vet'ion jr.",
       "Ring of the gods",
       "Dragon pickaxe",
       "Dragon 2h sword",
@@ -696,7 +640,6 @@
     "group": "Wilderness",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Spindel.png/200px-Spindel.png?2c818",
     "drops": [
-      "Venenatis spiderling",
       "Treasonous ring",
       "Dragon pickaxe",
       "Dragon 2h sword",
@@ -711,7 +654,6 @@
     "group": "Wilderness",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Artio.png/200px-Artio.png?bfba7",
     "drops": [
-      "Callisto cub",
       "Tyrannical ring",
       "Dragon pickaxe",
       "Dragon 2h sword",
@@ -726,13 +668,10 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dusk.png/200px-Dusk.png?2d6f0",
     "drops": [
-      "Noon",
       "Black tourmaline core",
       "Granite gloves",
       "Granite ring",
-      "Granite hammer",
-      "Jar of stone",
-      "Granite dust"
+      "Granite hammer"
     ]
   },
   {
@@ -742,13 +681,11 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Abyssal_Sire_%28phase_1%29.png/200px-Abyssal_Sire_%28phase_1%29.png?0db8f",
     "drops": [
-      "Abyssal orphan",
       "Unsired",
       "Abyssal head",
       "Bludgeon spine",
       "Bludgeon claw",
       "Bludgeon axon",
-      "Jar of miasma",
       "Abyssal dagger",
       "Abyssal whip"
     ]
@@ -760,10 +697,8 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Cave_kraken.png/200px-Cave_kraken.png?4612a",
     "drops": [
-      "Pet kraken",
       "Kraken tentacle",
-      "Trident of the seas (full)",
-      "Jar of dirt"
+      "Trident of the seas (full)"
     ]
   },
   {
@@ -773,13 +708,10 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Cerberus.png/200px-Cerberus.png?47f4c",
     "drops": [
-      "Hellpuppy",
       "Eternal crystal",
       "Pegasian crystal",
       "Primordial crystal",
-      "Jar of souls",
-      "Smouldering stone",
-      "Key master teleport"
+      "Smouldering stone"
     ]
   },
   {
@@ -789,11 +721,9 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Thermonuclear_smoke_devil.png/200px-Thermonuclear_smoke_devil.png?de858",
     "drops": [
-      "Pet smoke devil",
       "Occult necklace",
       "Smoke battlestaff",
-      "Dragon chainbody",
-      "Jar of smoke"
+      "Dragon chainbody"
     ]
   },
   {
@@ -803,16 +733,12 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Alchemical_Hydra_%28serpentine%29.png/200px-Alchemical_Hydra_%28serpentine%29.png?925dd",
     "drops": [
-      "Ikkle hydra",
       "Hydra's claw",
       "Hydra tail",
       "Hydra leather",
       "Hydra's fang",
       "Hydra's eye",
       "Hydra's heart",
-      "Dragon knife",
-      "Dragon thrownaxe",
-      "Jar of chemicals",
       "Alchemical hydra heads"
     ]
   },
@@ -823,16 +749,11 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Araxxor.png/200px-Araxxor.png?35d2e",
     "drops": [
-      "Nid",
-      "Araxyte venom sac",
-      "Spider cave teleport",
       "Araxyte fang",
       "Noxious point",
       "Noxious blade",
       "Noxious pommel",
-      "Araxyte head",
-      "Jar of venom",
-      "Coagulated venom"
+      "Araxyte head"
     ]
   },
   {
@@ -842,8 +763,6 @@
     "group": "Slayer",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Shellbane_gryphon.png/200px-Shellbane_gryphon.png?bc76e",
     "drops": [
-      "Gull",
-      "Jar of feathers",
       "Belle's folly (tarnished)",
       "Gryphon feather"
     ]
@@ -855,7 +774,6 @@
     "group": "Minigame",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Crystalline_Hunllef.png/200px-Crystalline_Hunllef.png?7737a",
     "drops": [
-      "Youngllef",
       "Crystal armour seed",
       "Crystal weapon seed",
       "Enhanced crystal weapon seed"
@@ -868,7 +786,6 @@
     "group": "Minigame",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Corrupted_Hunllef.png/200px-Corrupted_Hunllef.png?0cd55",
     "drops": [
-      "Youngllef",
       "Crystal armour seed",
       "Crystal weapon seed",
       "Enhanced crystal weapon seed",
@@ -882,7 +799,6 @@
     "group": "Minigame",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/TzTok-Jad.png/200px-TzTok-Jad.png?df681",
     "drops": [
-      "Tzrek-jad",
       "Fire cape"
     ]
   },
@@ -893,7 +809,6 @@
     "group": "Minigame",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/TzKal-Zuk.png/200px-TzKal-Zuk.png?2d222",
     "drops": [
-      "Jal-nib-rek",
       "Infernal cape"
     ]
   },
@@ -904,14 +819,12 @@
     "group": "Minigame",
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Sol_Heredit.png/200px-Sol_Heredit.png?91250",
     "drops": [
-      "Smol heredit",
       "Dizana's quiver (uncharged)",
       "Sunfire fanatic cuirass",
       "Sunfire fanatic chausses",
       "Sunfire fanatic helm",
       "Echo crystal",
-      "Tonalztics of ralos (uncharged)",
-      "Sunfire splinters"
+      "Tonalztics of ralos (uncharged)"
     ]
   }
 ]
