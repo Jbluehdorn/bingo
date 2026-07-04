@@ -824,5 +824,280 @@
       "Echo crystal",
       "Tonalztics of ralos (uncharged)"
     ]
+  },
+  {
+    "id": "pest-control",
+    "name": "Pest Control",
+    "title": "Pest Control",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/A_void_knight.png/200px-A_void_knight.png",
+    "drops": [
+      "Void melee helm",
+      "Void ranger helm",
+      "Void mage helm",
+      "Void knight top",
+      "Void knight robe",
+      "Void knight gloves",
+      "Void knight mace",
+      "Elite void top",
+      "Elite void robe"
+    ]
+  },
+  {
+    "id": "barbarian-assault",
+    "name": "Barbarian Assault",
+    "title": "Barbarian Assault",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Barbarian_Assault_logo.png/200px-Barbarian_Assault_logo.png",
+    "drops": [
+      "Fighter torso",
+      "Fighter hat",
+      "Penance skirt",
+      "Penance gloves",
+      "Penance boots",
+      "Dragon chainbody",
+      "Pet penance queen"
+    ]
+  },
+  {
+    "id": "castle-wars",
+    "name": "Castle Wars",
+    "title": "Castle Wars",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Castle_Wars_logo.png/200px-Castle_Wars_logo.png",
+    "drops": [
+      "Saradomin sword",
+      "Saradomin halo",
+      "Zamorak halo",
+      "Guthix halo",
+      "Decorative full helm (red)",
+      "Decorative armour (red)",
+      "Decorative legs (red)",
+      "Decorative skirt (red)",
+      "Decorative sword (red)",
+      "Decorative shield (red)",
+      "Decorative full helm (white)",
+      "Decorative armour (white)",
+      "Decorative legs (white)",
+      "Decorative skirt (white)",
+      "Decorative sword (white)",
+      "Decorative shield (white)",
+      "Decorative full helm (gold)",
+      "Decorative armour (gold)",
+      "Decorative legs (gold)",
+      "Decorative shield (gold)"
+    ]
+  },
+  {
+    "id": "soul-wars",
+    "name": "Soul Wars",
+    "title": "Soul Wars",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Soul_Wars_logo.png/200px-Soul_Wars_logo.png",
+    "drops": [
+      "Soul Wars cape (blue)",
+      "Soul Wars cape (red)",
+      "Soul Wars cape (green)",
+      "Blighted entangle sack",
+      "Blighted karambwan",
+      "Blighted manta ray",
+      "Blighted super restore (4)",
+      "Blighted ancient ice sack",
+      "Blighted surge sack",
+      "Blighted teleport spell sack"
+    ]
+  },
+  {
+    "id": "last-man-standing",
+    "name": "Last Man Standing",
+    "title": "Last Man Standing",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Last_Man_Standing_logo.png/200px-Last_Man_Standing_logo.png",
+    "drops": [
+      "Dragon pickaxe ornament kit",
+      "Dragon axe ornament kit",
+      "Dragon full helm ornament kit",
+      "Ornate maul handle"
+    ]
+  },
+  {
+    "id": "nightmare-zone",
+    "name": "Nightmare Zone",
+    "title": "Nightmare Zone",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Dominic_Onion.png/200px-Dominic_Onion.png",
+    "drops": [
+      "Scroll of redirection",
+      "Berserker ring (i)",
+      "Archers' ring (i)",
+      "Seers' ring (i)",
+      "Warrior ring (i)",
+      "Black mask (i)",
+      "Slayer helmet (i)"
+    ]
+  },
+  {
+    "id": "guardians-of-the-rift",
+    "name": "Guardians of the Rift",
+    "title": "Guardians of the Rift",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Guardians_of_the_Rift_logo.png/200px-Guardians_of_the_Rift_logo.png",
+    "drops": [
+      "Hat of the eye",
+      "Robe top of the eye",
+      "Robe bottom of the eye",
+      "Boots of the eye",
+      "Ring of the elements",
+      "Abyssal lantern",
+      "Abyssal needle",
+      "Catalytic tiara",
+      "Colossal pouch"
+    ]
+  },
+  {
+    "id": "hallowed-sepulchre",
+    "name": "Hallowed Sepulchre",
+    "title": "Hallowed Sepulchre",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Ring_of_endurance.png/200px-Ring_of_endurance.png",
+    "drops": [
+      "Ring of endurance",
+      "Strange old lockpick",
+      "Mysterious page 1",
+      "Mysterious page 2",
+      "Mysterious page 3",
+      "Mysterious page 4",
+      "Mysterious page 5",
+      "Hallowed ring",
+      "Hallowed grapple",
+      "Hallowed focus",
+      "Hallowed symbol",
+      "Hallowed hammer",
+      "Dark dye",
+      "Moss dye",
+      "Blood dye"
+    ]
+  },
+  {
+    "id": "tithe-farm",
+    "name": "Tithe Farm",
+    "title": "Tithe Farm",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Farmer%27s_hat.png/200px-Farmer%27s_hat.png",
+    "drops": [
+      "Farmer's hat",
+      "Farmer's jacket",
+      "Farmer's boro trousers",
+      "Farmer's boots",
+      "Gricoller's can",
+      "Herb sack",
+      "Seed box"
+    ]
+  },
+  {
+    "id": "mahogany-homes",
+    "name": "Mahogany Homes",
+    "title": "Mahogany Homes",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Carpenter%27s_helmet.png/200px-Carpenter%27s_helmet.png",
+    "drops": [
+      "Carpenter's helmet",
+      "Carpenter's shirt",
+      "Carpenter's trousers",
+      "Carpenter's boots",
+      "Amy's saw",
+      "Plank sack"
+    ]
+  },
+  {
+    "id": "fishing-trawler",
+    "name": "Fishing Trawler",
+    "title": "Fishing Trawler",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Angler%27s_outfit.png/200px-Angler%27s_outfit.png",
+    "drops": [
+      "Angler hat",
+      "Angler top",
+      "Angler waders",
+      "Angler boots"
+    ]
+  },
+  {
+    "id": "temple-trekking",
+    "name": "Temple Trekking",
+    "title": "Temple Trekking",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Lumberjack_hat.png/200px-Lumberjack_hat.png",
+    "drops": [
+      "Lumberjack hat",
+      "Lumberjack top",
+      "Lumberjack legs",
+      "Lumberjack boots"
+    ]
+  },
+  {
+    "id": "trouble-brewing",
+    "name": "Trouble Brewing",
+    "title": "Trouble Brewing",
+    "group": "Minigame",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Trouble_Brewing_logo.png/200px-Trouble_Brewing_logo.png",
+    "drops": [
+      "Red pirate bandana",
+      "Blue pirate bandana",
+      "Red stripy pirate shirt",
+      "Blue stripy pirate shirt",
+      "Red pirate's trousers",
+      "Blue pirate's trousers",
+      "Pirate boots",
+      "Brass hand hook",
+      "Eye patch"
+    ]
+  },
+  {
+    "id": "wintertodt",
+    "name": "Wintertodt",
+    "title": "Wintertodt",
+    "group": "Skilling Bosses",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Wintertodt.png/200px-Wintertodt.png",
+    "drops": [
+      "Pyromancer hat",
+      "Pyromancer top",
+      "Pyromancer bottoms",
+      "Pyromancer boots",
+      "Tome of fire",
+      "Bruma torch",
+      "Phoenix"
+    ]
+  },
+  {
+    "id": "tempoross",
+    "name": "Tempoross",
+    "title": "Tempoross",
+    "group": "Skilling Bosses",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Tempoross.png/200px-Tempoross.png",
+    "drops": [
+      "Spirit angler headband",
+      "Spirit angler top",
+      "Spirit angler waders",
+      "Spirit angler boots",
+      "Tome of water",
+      "Fish barrel",
+      "Tackle box",
+      "Dragon harpoon",
+      "Tiny tempor"
+    ]
+  },
+  {
+    "id": "zalcano",
+    "name": "Zalcano",
+    "title": "Zalcano",
+    "group": "Skilling Bosses",
+    "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Zalcano.png/200px-Zalcano.png",
+    "drops": [
+      "Crystal tool seed",
+      "Zalcano shard",
+      "Uncut onyx",
+      "Smolcano"
+    ]
   }
 ]
