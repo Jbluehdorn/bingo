@@ -23,7 +23,7 @@ const GROUP_ENTRIES: BossEntry[] = (() => {
     entries.push({
       id: `group:${groupName}`,
       name: groupName,
-      title: `All ${groupName} bosses · ${drops.length} unique drops`,
+      title: groupName,
       group: groupName,
       imageUrl: bosses[0].imageUrl,
       drops,
