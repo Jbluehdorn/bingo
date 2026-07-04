@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
 import BossSearch from "@/components/BossSearch";
 import { resolveStoredImageUrl } from "@/lib/images";
+import { getTileImageUrl } from "@/lib/images";
 import type {
   BossEntry,
   DropSubmissionWithDetails,
@@ -14,7 +15,7 @@ import type {
   TileType,
   TileWithProgress,
 } from "@/lib/types";
-import { OSRS_SKILLS, parseTileAcceptedDrops } from "@/lib/types";
+import { OSRS_SKILLS, getTileDisplayName, parseTileAcceptedDrops } from "@/lib/types";
 
 interface GamePayload {
   game: Game;
@@ -51,6 +52,75 @@ const emptyTileForm = {
   image_url: "",
 } satisfies TileEditorState;
 
+function AdminTileCard({
+  position,
+  tile,
+  isSelected,
+  onClick,
+}: {
+  position: number;
+  tile: Tile | undefined;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const initialSrc = tile ? resolveStoredImageUrl(getTileImageUrl(tile)) : "";
+  const [imgSrc, setImgSrc] = useState(initialSrc);
+
+  // Sync image when tile changes (e.g. after save)
+  useEffect(() => {
+    setImgSrc(tile ? resolveStoredImageUrl(getTileImageUrl(tile)) : "");
+  }, [tile]);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative flex min-h-34 flex-col gap-1.5 rounded border p-2 text-left transition-all ${
+        isSelected
+          ? "border-blue-400 bg-osrs-panel ring-2 ring-blue-400/40"
+          : tile
+            ? "border-osrs-border-light bg-osrs-panel hover:border-blue-400/50"
+            : "border-dashed border-osrs-border bg-osrs-panel-dark hover:border-osrs-border-light"
+      }`}
+    >
+      <div className="text-[10px] font-semibold text-osrs-text-muted">#{position}</div>
+      <div className="relative h-14 overflow-hidden rounded border border-osrs-border bg-osrs-panel-dark">
+        {imgSrc ? (
+          <Image
+            src={imgSrc}
+            alt={tile ? getTileDisplayName(tile) : ""}
+            fill
+            sizes="96px"
+            className="object-contain p-1"
+            unoptimized
+            onError={() => setImgSrc("")}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-xl">
+            {tile ? "🎯" : "＋"}
+          </div>
+        )}
+      </div>
+      <div className="min-h-8 flex-1">
+        <div className="line-clamp-2 text-xs font-semibold text-osrs-text-bright">
+          {tile ? getTileDisplayName(tile) : <span className="text-osrs-text-muted">Empty</span>}
+        </div>
+        {tile ? (
+          <div className="text-[11px] text-osrs-text-muted">
+            {tile.type === "drop"
+              ? `${tile.required_drops ?? 0} drop${(tile.required_drops ?? 0) !== 1 ? "s" : ""}`
+              : `${(tile.required_xp ?? 0).toLocaleString()} xp`}
+          </div>
+        ) : null}
+      </div>
+      {/* Edit overlay on hover */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="text-xl">✏️</span>
+      </div>
+    </button>
+  );
+}
+
 export default function AdminPage() {
   const [gameData, setGameData] = useState<GamePayload | null>(null);
   const [progressTiles, setProgressTiles] = useState<TileWithProgress[]>([]);
@@ -67,6 +137,10 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"Game" | "Teams" | "Tiles" | "Drops" | "Pets">("Game");
   const [scheduledInput, setScheduledInput] = useState(""); // datetime-local value (local tz)
+  const [activeTilePosition, setActiveTilePosition] = useState<number | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "pending" | "saving" | "saved" | "error">("idle");
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isOpeningTile = useRef(false);
 
   async function fetchAdminData() {
     const [gameResponse, tilesResponse, dropsResponse] = await Promise.all([
@@ -157,6 +231,9 @@ export default function AdminPage() {
         : "";
 
   function editTile(position: number) {
+    isOpeningTile.current = true;
+    setActiveTilePosition(position);
+    setAutoSaveStatus("idle");
     const existing = tileMap.get(position);
     if (existing) {
       setTileEditor({
@@ -175,6 +252,34 @@ export default function AdminPage() {
     }
     setTileEditor({ ...emptyTileForm, position, id: 0 });
   }
+
+  // Autosave: debounce 1.5s after any tileEditor change
+  useEffect(() => {
+    if (isOpeningTile.current) {
+      isOpeningTile.current = false;
+      return;
+    }
+    if (activeTilePosition === null) return;
+
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    setAutoSaveStatus("pending");
+
+    const snapshot = tileEditor;
+    autoSaveTimer.current = setTimeout(() => {
+      setAutoSaveStatus("saving");
+      doSaveTile(snapshot)
+        .then(() => {
+          setAutoSaveStatus("saved");
+          setTimeout(() => setAutoSaveStatus("idle"), 2500);
+        })
+        .catch(() => setAutoSaveStatus("error"));
+    }, 1500);
+
+    return () => {
+      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tileEditor, activeTilePosition]);
 
   function addAcceptedDrop() {
     const drop = newDropInput.trim();
@@ -280,29 +385,43 @@ export default function AdminPage() {
     });
   }
 
+  async function doSaveTile(snapshot: TileEditorState): Promise<void> {
+    const body = {
+      position: snapshot.position,
+      type: snapshot.type,
+      display_title: snapshot.display_title.trim() || null,
+      boss_name: snapshot.type === "drop" ? snapshot.boss_name.trim() || null : null,
+      required_drops: snapshot.type === "drop" ? Number(snapshot.required_drops) : null,
+      accepted_drops: snapshot.type === "drop" ? JSON.stringify(snapshot.accepted_drops) : null,
+      skill_name: snapshot.type === "xp" ? snapshot.skill_name : null,
+      required_xp: snapshot.type === "xp" ? Number(snapshot.required_xp) : null,
+      image_url: snapshot.image_url.trim() || null,
+    };
+
+    const isExisting = snapshot.id > 0;
+    const response = await fetch(isExisting ? `/api/tiles/${snapshot.id}` : "/api/tiles", {
+      method: isExisting ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const payload = (await response.json()) as { error?: string; tile?: { id: number } };
+    if (!response.ok) throw new Error(payload.error ?? "Failed to save tile.");
+
+    // Update the tile id if it was just created
+    if (!isExisting && payload.tile?.id) {
+      setTileEditor((cur) => ({ ...cur, id: payload.tile!.id }));
+    }
+
+    // Refresh the tile grid silently
+    const tilesRes = await fetch("/api/tiles");
+    const tilesPayload = (await tilesRes.json()) as { tiles?: TileWithProgress[] };
+    if (tilesPayload.tiles) setProgressTiles(tilesPayload.tiles);
+  }
+
   async function handleSaveTile() {
     await runAction(async () => {
-      const body = {
-        position: tileEditor.position,
-        type: tileEditor.type,
-        display_title: tileEditor.display_title.trim() || null,
-        boss_name: tileEditor.type === "drop" ? tileEditor.boss_name.trim() : null,
-        required_drops: tileEditor.type === "drop" ? Number(tileEditor.required_drops) : null,
-        accepted_drops: tileEditor.type === "drop" ? JSON.stringify(tileEditor.accepted_drops) : null,
-        skill_name: tileEditor.type === "xp" ? tileEditor.skill_name : null,
-        required_xp: tileEditor.type === "xp" ? Number(tileEditor.required_xp) : null,
-        image_url: tileEditor.image_url.trim() || null,
-      };
-
-      const isExisting = tileEditor.id > 0;
-      const response = await fetch(isExisting ? `/api/tiles/${tileEditor.id}` : "/api/tiles", {
-        method: isExisting ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const payload = (await response.json()) as { error?: string; message?: string };
-      if (!response.ok) throw new Error(payload.error ?? "Failed to save tile.");
-      setMessage(payload.message ?? "Tile saved.");
+      await doSaveTile(tileEditor);
+      setMessage("Tile saved.");
     });
   }
 
@@ -314,6 +433,7 @@ export default function AdminPage() {
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Failed to delete tile.");
       setTileEditor({ ...emptyTileForm, position: tileEditor.position });
+      setActiveTilePosition(null);
       setMessage(payload.message ?? "Tile deleted.");
     });
   }
@@ -576,141 +696,172 @@ export default function AdminPage() {
       {activeTab === "Tiles" && (
         <div className="osrs-panel p-6">
           <h2 className="mb-4 text-xl font-semibold text-osrs-text-bright">Tile Setup</h2>
-          <div className="grid gap-2 sm:grid-cols-5">
-            {Array.from({ length: 25 }, (_, index) => index + 1).map((position) => {
-              const tile = tileMap.get(position);
-              return (
-                <button key={position} type="button" className={`rounded border p-3 text-left ${tile ? "border-osrs-border-light bg-osrs-panel" : "border-dashed border-osrs-border bg-osrs-panel-dark"}`} onClick={() => editTile(position)}>
-                  <div className="text-xs text-osrs-text-muted">#{position}</div>
-                  <div className="font-semibold text-osrs-text-bright">
-                    {tile ? (tile.display_title ?? (tile.type === "drop" ? tile.boss_name : tile.skill_name)) : "Empty"}
-                  </div>
-                  <div className="text-xs text-osrs-text-muted">{tile ? (tile.type === "drop" ? `${tile.required_drops} drops` : `${tile.required_xp?.toLocaleString()} xp`) : "Click to configure"}</div>
-                </button>
-              );
-            })}
+
+          {/* Tile grid — styled like the player board */}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            {Array.from({ length: 25 }, (_, index) => index + 1).map((position) => (
+              <AdminTileCard
+                key={position}
+                position={position}
+                tile={tileMap.get(position)}
+                isSelected={activeTilePosition === position}
+                onClick={() => editTile(position)}
+              />
+            ))}
           </div>
 
-          <div className="mt-6 rounded border border-osrs-border bg-osrs-panel-dark p-4">
-            <h3 className="mb-1 text-xl font-semibold">Tile Editor — Position #{tileEditor.position}</h3>
-            <p className="mb-3 text-xs text-osrs-text-muted"><span className="text-red-400">*</span> Required field</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="flex flex-col gap-2">
-                <span className="font-semibold">Type <span className="text-red-400">*</span></span>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "drop"} onChange={() => setTileEditor((current) => ({ ...current, type: "drop" }))} />Drop</label>
-                  <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "xp"} onChange={() => setTileEditor((current) => ({ ...current, type: "xp" }))} />XP</label>
+          {/* Editor — only shown when a tile is selected */}
+          {activeTilePosition !== null && (
+            <div className="mt-6 rounded border border-osrs-border bg-osrs-panel-dark p-4">
+              {/* Editor header */}
+              <div className="mb-3 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-xl font-semibold">Tile Editor — Position #{tileEditor.position}</h3>
+                  {autoSaveStatus === "pending" && (
+                    <span className="text-xs text-osrs-text-muted">Unsaved changes…</span>
+                  )}
+                  {autoSaveStatus === "saving" && (
+                    <span className="text-xs text-osrs-text-muted">Saving…</span>
+                  )}
+                  {autoSaveStatus === "saved" && (
+                    <span className="text-xs text-green-400">✓ Saved</span>
+                  )}
+                  {autoSaveStatus === "error" && (
+                    <span className="text-xs text-red-400">⚠ Save failed</span>
+                  )}
                 </div>
+                <button
+                  type="button"
+                  className="text-osrs-text-muted hover:text-osrs-text"
+                  aria-label="Close editor"
+                  onClick={() => setActiveTilePosition(null)}
+                >
+                  ✕
+                </button>
               </div>
+              <p className="mb-3 text-xs text-osrs-text-muted"><span className="text-red-400">*</span> Required field · Changes save automatically</p>
 
-              {tileEditor.type === "drop" ? (
-                <>
-                  {/* Display title — full width */}
-                  <label className="flex flex-col gap-2 md:col-span-2">
-                    <span className="font-semibold">
-                      Display Title <span className="text-red-400">*</span>
-                      <span className="ml-1 text-xs font-normal text-osrs-text-muted">(shown on board; auto-filled when you select a boss)</span>
-                    </span>
-                    <input
-                      className="osrs-input"
-                      placeholder="e.g. Zulrah, Barrows Chest, Theatre of Blood…"
-                      value={tileEditor.display_title}
-                      onChange={(e) => setTileEditor((cur) => ({ ...cur, display_title: e.target.value }))}
-                    />
-                  </label>
-
-                  {/* Boss search */}
-                  <div className="flex flex-col gap-2">
-                    <span className="font-semibold">Boss / Raid <span className="text-xs font-normal text-osrs-text-muted">(optional)</span></span>
-                    <BossSearch
-                      value={tileEditor.boss_name}
-                      onSelect={(boss: BossEntry) => {
-                        setTileEditor((current) => ({
-                          ...current,
-                          boss_name: boss.name,
-                          display_title: current.display_title || boss.title,
-                          image_url: boss.imageUrl || current.image_url,
-                          accepted_drops: boss.drops,
-                        }));
-                      }}
-                    />
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="flex flex-col gap-2">
+                  <span className="font-semibold">Type <span className="text-red-400">*</span></span>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "drop"} onChange={() => setTileEditor((current) => ({ ...current, type: "drop" }))} />Drop</label>
+                    <label className="flex items-center gap-2"><input type="radio" checked={tileEditor.type === "xp"} onChange={() => setTileEditor((current) => ({ ...current, type: "xp" }))} />XP</label>
                   </div>
+                </div>
 
-                  <label className="flex flex-col gap-2">
-                    <span className="font-semibold">Required Drops <span className="text-red-400">*</span></span>
-                    <input className="osrs-input" type="number" min={1} value={tileEditor.required_drops} onChange={(event) => setTileEditor((current) => ({ ...current, required_drops: Number(event.target.value) }))} />
-                  </label>
-
-                  <div className="flex flex-col gap-3 md:col-span-2">
-                    <span className="font-semibold">Accepted Drops <span className="text-xs font-normal text-osrs-text-muted">(optional — auto-populated from boss)</span></span>
-
-                    <div className="min-h-[2.5rem] flex flex-wrap gap-2 rounded border border-osrs-border bg-osrs-panel-dark p-2">
-                      {tileEditor.accepted_drops.length ? (
-                        tileEditor.accepted_drops.map((drop) => (
-                          <span
-                            key={drop}
-                            className="flex items-center gap-1 rounded border border-osrs-border bg-osrs-panel px-2 py-1 text-sm"
-                          >
-                            {drop}
-                            <button
-                              type="button"
-                              aria-label={`Remove ${drop}`}
-                              className="ml-1 text-osrs-text-muted hover:text-red-400"
-                              onClick={() => removeAcceptedDrop(drop)}
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-sm text-osrs-text-muted">
-                          Select a boss to auto-populate, or add manually below.
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2">
+                {tileEditor.type === "drop" ? (
+                  <>
+                    {/* Display title — full width */}
+                    <label className="flex flex-col gap-2 md:col-span-2">
+                      <span className="font-semibold">
+                        Display Title <span className="text-red-400">*</span>
+                        <span className="ml-1 text-xs font-normal text-osrs-text-muted">(shown on board; auto-filled when you select a boss)</span>
+                      </span>
                       <input
                         className="osrs-input"
-                        placeholder="Add a drop…"
-                        value={newDropInput}
-                        onChange={(e) => setNewDropInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") { e.preventDefault(); addAcceptedDrop(); }
+                        placeholder="e.g. Zulrah, Barrows Chest, Theatre of Blood…"
+                        value={tileEditor.display_title}
+                        onChange={(e) => setTileEditor((cur) => ({ ...cur, display_title: e.target.value }))}
+                      />
+                    </label>
+
+                    {/* Boss search */}
+                    <div className="flex flex-col gap-2">
+                      <span className="font-semibold">Boss / Raid <span className="text-xs font-normal text-osrs-text-muted">(optional)</span></span>
+                      <BossSearch
+                        value={tileEditor.boss_name}
+                        onSelect={(boss: BossEntry) => {
+                          setTileEditor((current) => ({
+                            ...current,
+                            boss_name: boss.name,
+                            display_title: current.display_title || boss.title,
+                            image_url: boss.imageUrl || current.image_url,
+                            accepted_drops: boss.drops,
+                          }));
                         }}
                       />
-                      <button type="button" className="osrs-button shrink-0" onClick={addAcceptedDrop}>
-                        Add
-                      </button>
                     </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <label className="flex flex-col gap-2">
-                    <span className="font-semibold">Skill <span className="text-red-400">*</span></span>
-                    <select className="osrs-input" value={tileEditor.skill_name} onChange={(event) => setTileEditor((current) => ({ ...current, skill_name: event.target.value }))}>
-                      {OSRS_SKILLS.map((skill) => <option key={skill} value={skill}>{skill}</option>)}
-                    </select>
-                  </label>
-                  <label className="flex flex-col gap-2">
-                    <span className="font-semibold">Required XP <span className="text-red-400">*</span></span>
-                    <input className="osrs-input" type="number" min={1} value={tileEditor.required_xp} onChange={(event) => setTileEditor((current) => ({ ...current, required_xp: Number(event.target.value) }))} />
-                  </label>
-                </>
-              )}
 
-              <label className="flex flex-col gap-2 md:col-span-2">
-                <span className="font-semibold">Image URL / Stored Key <span className="text-xs font-normal text-osrs-text-muted">(optional — auto-filled from boss)</span></span>
-                <input className="osrs-input" value={tileEditor.image_url} onChange={(event) => setTileEditor((current) => ({ ...current, image_url: event.target.value }))} />
-              </label>
-            </div>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Required Drops <span className="text-red-400">*</span></span>
+                      <input className="osrs-input" type="number" min={1} value={tileEditor.required_drops} onChange={(event) => setTileEditor((current) => ({ ...current, required_drops: Number(event.target.value) }))} />
+                    </label>
 
-            <div className="mt-4 flex gap-3">
-              <button type="button" className="osrs-button" onClick={() => void handleSaveTile()}>Save Tile</button>
-              {tileEditor.id ? <button type="button" className="osrs-button border-red-800 !bg-red-900" onClick={() => void handleDeleteTile()}>Delete Tile</button> : null}
+                    <div className="flex flex-col gap-3 md:col-span-2">
+                      <span className="font-semibold">Accepted Drops <span className="text-xs font-normal text-osrs-text-muted">(optional — auto-populated from boss)</span></span>
+
+                      <div className="min-h-[2.5rem] flex flex-wrap gap-2 rounded border border-osrs-border bg-osrs-panel-dark p-2">
+                        {tileEditor.accepted_drops.length ? (
+                          tileEditor.accepted_drops.map((drop) => (
+                            <span
+                              key={drop}
+                              className="flex items-center gap-1 rounded border border-osrs-border bg-osrs-panel px-2 py-1 text-sm"
+                            >
+                              {drop}
+                              <button
+                                type="button"
+                                aria-label={`Remove ${drop}`}
+                                className="ml-1 text-osrs-text-muted hover:text-red-400"
+                                onClick={() => removeAcceptedDrop(drop)}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-sm text-osrs-text-muted">
+                            Select a boss to auto-populate, or add manually below.
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <input
+                          className="osrs-input"
+                          placeholder="Add a drop…"
+                          value={newDropInput}
+                          onChange={(e) => setNewDropInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") { e.preventDefault(); addAcceptedDrop(); }
+                          }}
+                        />
+                        <button type="button" className="osrs-button shrink-0" onClick={addAcceptedDrop}>
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Skill <span className="text-red-400">*</span></span>
+                      <select className="osrs-input" value={tileEditor.skill_name} onChange={(event) => setTileEditor((current) => ({ ...current, skill_name: event.target.value }))}>
+                        {OSRS_SKILLS.map((skill) => <option key={skill} value={skill}>{skill}</option>)}
+                      </select>
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-semibold">Required XP <span className="text-red-400">*</span></span>
+                      <input className="osrs-input" type="number" min={1} value={tileEditor.required_xp} onChange={(event) => setTileEditor((current) => ({ ...current, required_xp: Number(event.target.value) }))} />
+                    </label>
+                  </>
+                )}
+
+                <label className="flex flex-col gap-2 md:col-span-2">
+                  <span className="font-semibold">Image URL / Stored Key <span className="text-xs font-normal text-osrs-text-muted">(optional — auto-filled from boss)</span></span>
+                  <input className="osrs-input" value={tileEditor.image_url} onChange={(event) => setTileEditor((current) => ({ ...current, image_url: event.target.value }))} />
+                </label>
+              </div>
+
+              {tileEditor.id ? (
+                <div className="mt-4">
+                  <button type="button" className="osrs-button border-red-800 !bg-red-900" onClick={() => void handleDeleteTile()}>
+                    Delete Tile
+                  </button>
+                </div>
+              ) : null}
             </div>
-          </div>
+          )}
         </div>
       )}
 

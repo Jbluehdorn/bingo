@@ -105,7 +105,8 @@ export async function POST(request: Request) {
       body.image_url?.trim() ?? null,
     ).run();
 
-    return Response.json({ message: "Tile created successfully." }, { status: 201 });
+    const result = await env.DB.prepare("SELECT id FROM tiles WHERE position = ?").bind(Number(body.position)).first<{ id: number }>();
+    return Response.json({ message: "Tile created successfully.", tile: { id: result?.id } }, { status: 201 });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "Failed to save tile." }, { status: 500 });
   }
