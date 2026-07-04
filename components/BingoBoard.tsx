@@ -101,6 +101,20 @@ function BoardMiniTile({
 export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) {
   const teamTiles = tiles.map((tile) => (teamIndex === 0 ? tile.team1 : tile.team2));
   const completeCount = teamTiles.filter((tile) => tile.is_complete).length;
+  const storageKey = `board-collapsed-${team.id}`;
+
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(storageKey) === "true";
+  });
+
+  function toggle() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(storageKey, String(next));
+      return next;
+    });
+  }
 
   return (
     <section className="osrs-panel flex flex-col gap-4 p-4">
@@ -124,34 +138,43 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
             <h2 className="text-2xl">{team.name}</h2>
             <p className="text-sm text-osrs-text-muted">{completeCount}/25 tiles complete</p>
           </div>
-          <Link
-            href={`/log-drop?team=${team.id}`}
-            className="osrs-button shrink-0 text-sm"
-          >
-            Log a Drop
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href={`/log-drop?team=${team.id}`} className="osrs-button text-sm">
+              Log a Drop
+            </Link>
+            <button
+              type="button"
+              onClick={toggle}
+              className="rounded border border-osrs-border bg-osrs-panel px-2 py-1 text-sm text-osrs-text transition-colors hover:bg-osrs-panel-dark"
+              title={collapsed ? "Expand board" : "Collapse board"}
+            >
+              {collapsed ? "▼" : "▲"}
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-        {tiles.map((entry) => {
-          const progress = teamIndex === 0 ? entry.team1 : entry.team2;
-          const progressText = entry.tile.type === "drop"
-            ? `${progress.current_drops}/${entry.tile.required_drops ?? 0} drops`
-            : `${formatNumber(progress.current_xp)} / ${formatNumber(entry.tile.required_xp ?? 0)} xp`;
+      {!collapsed && (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          {tiles.map((entry) => {
+            const progress = teamIndex === 0 ? entry.team1 : entry.team2;
+            const progressText = entry.tile.type === "drop"
+              ? `${progress.current_drops}/${entry.tile.required_drops ?? 0} drops`
+              : `${formatNumber(progress.current_xp)} / ${formatNumber(entry.tile.required_xp ?? 0)} xp`;
 
-          return (
-            <BoardMiniTile
-              key={entry.tile.id}
-              tile={entry.tile}
-              isComplete={progress.is_complete}
-              progressText={progressText}
-              petCompleted={progress.pet_completed}
-              contributors={progress.contributors}
+            return (
+              <BoardMiniTile
+                key={entry.tile.id}
+                tile={entry.tile}
+                isComplete={progress.is_complete}
+                progressText={progressText}
+                petCompleted={progress.pet_completed}
+                contributors={progress.contributors}
             />
           );
         })}
-      </div>
+        </div>
+      )}
     </section>
   );
 }
