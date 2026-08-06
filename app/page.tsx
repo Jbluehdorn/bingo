@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 
-import BingoBoard from "@/components/BingoBoard";
+import BoardDisplay from "@/components/BoardDisplay";
 import StartCountdown from "@/components/StartCountdown";
 import { getEnv } from "@/lib/cloudflare";
 import { computeAllTilesProgress, getGame, getPlayers, getTeamById, getTeams, getTiles } from "@/lib/db";
@@ -114,11 +114,10 @@ export default async function HomePage() {
           🏆 The boards will be revealed when the competition starts. Stay tuned!
         </div>
       ) : orderedTeams.length === 2 && progress.length > 0 ? (
-        <div className="grid gap-6 xl:grid-cols-2">
-          {orderedTeams.map((team, index) => (
-            <BingoBoard key={team.id} tiles={progress} team={team} teamIndex={index as 0 | 1} />
-          ))}
-        </div>
+        <BoardDisplay
+          teams={orderedTeams as [typeof orderedTeams[number], typeof orderedTeams[number]]}
+          tiles={progress}
+        />
       ) : (
         <div className="osrs-panel p-6 text-center text-osrs-text-muted">
           Configure all 25 tiles in the admin panel to see the live boards.

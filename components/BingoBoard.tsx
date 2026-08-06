@@ -30,16 +30,20 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
   const { tile } = entry;
   const initialSrc = useMemo(() => resolveStoredImageUrl(getTileImageUrl(tile)), [tile]);
   const [imageSrc, setImageSrc] = useState(initialSrc);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const acceptedDrops = useMemo(() => parseTileAcceptedDrops(tile), [tile]);
   const displayName = getTileDisplayName(tile);
+  const images = progress.drop_images;
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") setCarouselIndex((i) => (i > 0 ? i - 1 : images.length - 1));
+      if (e.key === "ArrowRight") setCarouselIndex((i) => (i < images.length - 1 ? i + 1 : 0));
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, images.length]);
 
   // Prevent body scroll while modal is open
   useEffect(() => {
@@ -81,11 +85,62 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
             <h3 className="mt-1 text-lg font-semibold text-osrs-text-bright">{displayName}</h3>
             <p className="text-sm text-osrs-text">{progressText}</p>
           </div>
-          <button type="button" onClick={onClose} className="shrink-0 self-start text-osrs-text-muted hover:text-osrs-text-bright text-xl leading-none">✕</button>
+          <button type="button" onClick={onClose} className="shrink-0 cursor-pointer self-start text-osrs-text-muted hover:text-osrs-text-bright text-xl leading-none">✕</button>
         </div>
 
         {/* Body */}
         <div className="max-h-[60vh] overflow-y-auto p-4 flex flex-col gap-4">
+          {/* Custom rules */}
+          {tile.custom_rules && (
+            <div>
+              <div className="mb-1 text-sm font-semibold text-osrs-text-bright">📋 Custom Rules</div>
+              <p className="whitespace-pre-wrap text-sm text-osrs-text">{tile.custom_rules}</p>
+            </div>
+          )}
+
+          {/* Drop screenshot carousel */}
+          {images.length > 0 && (
+            <div>
+              <div className="mb-2 text-sm font-semibold text-osrs-text-bright">
+                Drop Screenshots <span className="font-normal text-osrs-text-muted">({images.length})</span>
+              </div>
+              <div className="relative overflow-hidden rounded border border-osrs-border bg-osrs-panel-dark">
+                <div className="relative aspect-video w-full">
+                  <Image
+                    src={resolveStoredImageUrl(images[carouselIndex]!.url)}
+                    alt={`Drop by ${images[carouselIndex]!.player}`}
+                    fill
+                    sizes="448px"
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+                <div className="flex items-center justify-between border-t border-osrs-border px-3 py-2">
+                  <button
+                    type="button"
+                    onClick={() => setCarouselIndex((i) => (i > 0 ? i - 1 : images.length - 1))}
+                    className="cursor-pointer rounded px-2 py-0.5 text-sm text-osrs-text-muted hover:text-osrs-text-bright disabled:opacity-30"
+                    disabled={images.length <= 1}
+                  >
+                    ‹ Prev
+                  </button>
+                  <div className="text-center">
+                    <span className="text-xs text-osrs-text-bright">{images[carouselIndex]!.player}</span>
+                    <span className="ml-2 text-xs text-osrs-text-muted">{carouselIndex + 1} / {images.length}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCarouselIndex((i) => (i < images.length - 1 ? i + 1 : 0))}
+                    className="cursor-pointer rounded px-2 py-0.5 text-sm text-osrs-text-muted hover:text-osrs-text-bright disabled:opacity-30"
+                    disabled={images.length <= 1}
+                  >
+                    Next ›
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Contributors */}
           {progress.contributors.length > 0 && (
             <div>
@@ -215,6 +270,12 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
   });
   const [selectedEntry, setSelectedEntry] = useState<TileWithProgress | null>(null);
 
+  const petProofLogged = !!team.pet_image_url;
+  const petAwardEntry = tiles.find((entry) => {
+    const progress = teamIndex === 0 ? entry.team1 : entry.team2;
+    return progress.pet_completed;
+  });
+
   function toggle() {
     setCollapsed((prev) => {
       const next = !prev;
@@ -267,26 +328,74 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
       </div>
 
       {!collapsed && (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-          {tiles.map((entry) => {
-            const progress = teamIndex === 0 ? entry.team1 : entry.team2;
-            const progressText = entry.tile.type === "drop"
-              ? `${progress.current_drops}/${entry.tile.required_drops ?? 0} drops`
-              : `${formatNumber(progress.current_xp)} / ${formatNumber(entry.tile.required_xp ?? 0)} xp`;
+        <>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            {tiles.map((entry) => {
+              const progress = teamIndex === 0 ? entry.team1 : entry.team2;
+              const progressText = entry.tile.type === "drop"
+                ? `${progress.current_drops}/${entry.tile.required_drops ?? 0} drops`
+                : `${formatNumber(progress.current_xp)} / ${formatNumber(entry.tile.required_xp ?? 0)} xp`;
 
-            return (
-              <BoardMiniTile
-                key={entry.tile.id}
-                tile={entry.tile}
-                isComplete={progress.is_complete}
-                progressText={progressText}
-                petCompleted={progress.pet_completed}
-                contributors={progress.contributors}
-                onClick={() => setSelectedEntry(entry)}
-              />
-            );
-          })}
-        </div>
+              return (
+                <BoardMiniTile
+                  key={entry.tile.id}
+                  tile={entry.tile}
+                  isComplete={progress.is_complete}
+                  progressText={progressText}
+                  petCompleted={progress.pet_completed}
+                  contributors={progress.contributors}
+                  onClick={() => setSelectedEntry(entry)}
+                />
+              );
+            })}
+          </div>
+
+          {/* Bonus Pet Tile */}
+          <div className="mt-2">
+            <div className={`flex items-center justify-between gap-4 rounded border p-3 transition-colors ${petAwardEntry ? "border-osrs-green-border bg-osrs-green/20" : petProofLogged ? "border-yellow-700 bg-yellow-950/30" : "border-osrs-border bg-osrs-panel-dark"}`}>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🐾</span>
+                <div>
+                  <div className="text-sm font-semibold text-osrs-text-bright">🏆 Bonus Pet Tile</div>
+                  {petAwardEntry ? (
+                    <>
+                      <p className="text-sm text-osrs-gold">
+                        Free tile awarded: #{petAwardEntry.tile.position} {getTileDisplayName(petAwardEntry.tile)}
+                      </p>
+                      {team.pet_obtained_by ? (
+                        <p className="text-xs text-osrs-text-muted">
+                          Pet proof logged by {team.pet_obtained_by}
+                          {team.pet_name ? ` (${team.pet_name})` : ""}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : petProofLogged ? (
+                    <>
+                      <p className="text-sm text-yellow-200">
+                        Proof logged by {team.pet_obtained_by ?? "the team"}
+                        {team.pet_name ? ` (${team.pet_name})` : ""}
+                      </p>
+                      <p className="text-xs text-osrs-text-muted">Awaiting admin tile award</p>
+                      <a
+                        href={resolveStoredImageUrl(team.pet_image_url!)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-block text-xs text-osrs-text underline"
+                      >
+                        View proof
+                      </a>
+                    </>
+                  ) : (
+                    <p className="text-sm text-osrs-text-muted italic">No pet proof logged</p>
+                  )}
+                </div>
+              </div>
+              <Link href={`/log-pet?team=${team.id}`} className="osrs-button shrink-0 text-sm">
+                {petProofLogged ? "Update Proof" : "Log Pet Proof"}
+              </Link>
+            </div>
+          </div>
+        </>
       )}
 
       {selectedEntry && (

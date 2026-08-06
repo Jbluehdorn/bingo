@@ -86,8 +86,9 @@ export async function getDropSubmissionsWithDetails(
         ds.*,
         p.username AS player_username,
         t.name AS team_name,
+        tile.position AS tile_position,
         CASE
-          WHEN tile.type = 'drop' THEN COALESCE(tile.boss_name, 'Drop Tile')
+          WHEN tile.type = 'drop' THEN COALESCE(tile.display_title, tile.boss_name, 'Drop Tile')
           ELSE COALESCE(tile.skill_name, 'XP Tile')
         END AS tile_name
       FROM drop_submissions ds
@@ -111,6 +112,7 @@ function buildEmptyProgress(teamId: number): TeamTileProgress {
     current_drops: 0,
     current_xp: 0,
     contributors: [],
+    drop_images: [],
   };
 }
 
@@ -151,6 +153,7 @@ export async function computeAllTilesProgress(
 
   const dropCountMap = new Map<string, number>();
   const dropContributorsMap = new Map<string, string[]>();
+  const dropImagesMap = new Map<string, { url: string; player: string }[]>();
   // Iterate oldest-first so the contributors list is in chronological drop order
   for (const drop of [...drops].reverse()) {
     const key = `${drop.tile_id}:${drop.team_id}`;
@@ -159,6 +162,8 @@ export async function computeAllTilesProgress(
     if (player) {
       if (!dropContributorsMap.has(key)) dropContributorsMap.set(key, []);
       dropContributorsMap.get(key)!.push(player.username);
+      if (!dropImagesMap.has(key)) dropImagesMap.set(key, []);
+      dropImagesMap.get(key)!.push({ url: drop.image_url, player: player.username });
     }
   }
 
@@ -207,6 +212,7 @@ export async function computeAllTilesProgress(
         current_drops: currentDrops,
         current_xp: currentXp,
         contributors: dropContributorsMap.get(`${tile.id}:${teamId}`) ?? [],
+        drop_images: dropImagesMap.get(`${tile.id}:${teamId}`) ?? [],
       };
     };
 

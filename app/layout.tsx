@@ -16,9 +16,12 @@ export default function RootLayout({
     <html lang="en" className="h-full bg-osrs-bg">
       <body className="flex min-h-full flex-col bg-osrs-bg text-osrs-text">
         <header className="border-b-2 border-osrs-border bg-osrs-panel-dark/95">
-          <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4">
+          <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4">
             <Link href="/" className="text-2xl font-bold tracking-wide text-osrs-text-bright">
               OSRS Bingo
+            </Link>
+            <Link href="/activity" className="text-sm font-semibold text-osrs-text hover:text-osrs-text-bright">
+              Activity Log
             </Link>
           </nav>
         </header>

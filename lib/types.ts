@@ -40,6 +40,9 @@ export interface Team {
   id: number;
   name: string;
   photo_url: string | null;
+  pet_image_url: string | null;
+  pet_name: string | null;
+  pet_obtained_by: string | null;
   created_at: string;
 }
 
@@ -67,6 +70,7 @@ export interface Tile {
   skill_name: string | null;
   required_xp: number | null;
   image_url: string | null;
+  custom_rules: string | null;
   created_at: string;
 }
 
@@ -108,6 +112,7 @@ export interface DropSubmissionWithDetails extends DropSubmission {
   player_username: string;
   team_name: string;
   tile_name: string;
+  tile_position: number;
 }
 
 export interface XpSnapshot {
@@ -138,4 +143,5 @@ export interface TeamTileProgress {
   current_drops: number;
   current_xp: number;
   contributors: string[]; // usernames of players who logged drops for this tile
+  drop_images: { url: string; player: string }[]; // screenshots in chronological order
 }

@@ -14,6 +14,7 @@ function validateTilePayload(body: {
   skill_name?: string | null;
   required_xp?: number | null;
   image_url?: string | null;
+  custom_rules?: string | null;
 }) {
   const position = Number(body.position);
   if (!position || position < 1 || position > 25) {
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
       skill_name?: string | null;
       required_xp?: number | null;
       image_url?: string | null;
+      custom_rules?: string | null;
     };
 
     const validationError = validateTilePayload(body);
@@ -74,7 +76,7 @@ export async function POST(request: Request) {
     if (existing) {
       await env.DB.prepare(`
         UPDATE tiles
-        SET type = ?, display_title = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
+        SET type = ?, display_title = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?, custom_rules = ?
         WHERE id = ?
       `).bind(
         body.type,
@@ -85,14 +87,15 @@ export async function POST(request: Request) {
         body.type === "xp" ? body.skill_name?.trim().toLowerCase() ?? null : null,
         body.type === "xp" ? Number(body.required_xp) : null,
         body.image_url?.trim() ?? null,
+        body.custom_rules?.trim() ?? null,
         existing.id,
       ).run();
       return Response.json({ message: "Tile updated successfully." });
     }
 
     await env.DB.prepare(`
-      INSERT INTO tiles (position, type, display_title, boss_name, required_drops, accepted_drops, skill_name, required_xp, image_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tiles (position, type, display_title, boss_name, required_drops, accepted_drops, skill_name, required_xp, image_url, custom_rules)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       Number(body.position),
       body.type,
@@ -103,6 +106,7 @@ export async function POST(request: Request) {
       body.type === "xp" ? body.skill_name?.trim().toLowerCase() ?? null : null,
       body.type === "xp" ? Number(body.required_xp) : null,
       body.image_url?.trim() ?? null,
+      body.custom_rules?.trim() ?? null,
     ).run();
 
     const result = await env.DB.prepare("SELECT id FROM tiles WHERE position = ?").bind(Number(body.position)).first<{ id: number }>();

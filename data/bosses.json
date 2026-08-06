@@ -234,7 +234,8 @@
       "Awakener's orb",
       "Magus vestige",
       "Eye of the duke",
-      "Ice quartz"
+      "Ice quartz",
+      "Jar of chemicals"
     ]
   },
   {
@@ -352,7 +353,8 @@
       "Magma mutagen",
       "Magic fang",
       "Serpentine visage",
-      "Tanzanite fang"
+      "Tanzanite fang",
+      "Jar of swamp"
     ]
   },
   {
@@ -365,7 +367,8 @@
       "Vorkath's head",
       "Draconic visage",
       "Skeletal visage",
-      "Dragonbone necklace"
+      "Dragonbone necklace",
+      "Jar of decay"
     ]
   },
   {
@@ -383,7 +386,8 @@
       "Volatile orb",
       "Harmonised orb",
       "Eldritch orb",
-      "Slepey tablet"
+      "Slepey tablet",
+      "Jar of dreams"
     ]
   },
   {
@@ -498,7 +502,8 @@
       "Kq head",
       "Dragon 2h sword",
       "Dragon chainbody",
-      "Dragon pickaxe"
+      "Dragon pickaxe",
+      "Jar of sand"
     ]
   },
   {
@@ -510,7 +515,8 @@
     "drops": [
       "Giant egg sac",
       "Sarachnis cudgel",
-      "Pristine spider silk"
+      "Pristine spider silk",
+      "Jar of eyes"
     ]
   },
   {
@@ -669,7 +675,8 @@
       "Black tourmaline core",
       "Granite gloves",
       "Granite ring",
-      "Granite hammer"
+      "Granite hammer",
+      "Jar of stone"
     ]
   },
   {
@@ -685,7 +692,8 @@
       "Bludgeon claw",
       "Bludgeon axon",
       "Abyssal dagger",
-      "Abyssal whip"
+      "Abyssal whip",
+      "Jar of miasma"
     ]
   },
   {
@@ -696,7 +704,8 @@
     "imageUrl": "https://oldschool.runescape.wiki/images/thumb/Cave_kraken.png/200px-Cave_kraken.png?4612a",
     "drops": [
       "Kraken tentacle",
-      "Trident of the seas (full)"
+      "Trident of the seas (full)",
+      "Jar of dirt"
     ]
   },
   {
@@ -709,7 +718,8 @@
       "Eternal crystal",
       "Pegasian crystal",
       "Primordial crystal",
-      "Smouldering stone"
+      "Smouldering stone",
+      "Jar of souls"
     ]
   },
   {
@@ -721,7 +731,8 @@
     "drops": [
       "Occult necklace",
       "Smoke battlestaff",
-      "Dragon chainbody"
+      "Dragon chainbody",
+      "Jar of smoke"
     ]
   },
   {
@@ -1084,7 +1095,8 @@
       "Fish barrel",
       "Tackle box",
       "Dragon harpoon",
-      "Tiny tempor"
+      "Tiny tempor",
+      "Jar of spirits"
     ]
   },
   {

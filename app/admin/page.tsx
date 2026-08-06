@@ -37,6 +37,7 @@ interface TileEditorState {
   skill_name: string;
   required_xp: number;
   image_url: string;
+  custom_rules: string;
 }
 
 const emptyTileForm = {
@@ -50,6 +51,7 @@ const emptyTileForm = {
   skill_name: "attack",
   required_xp: 100000,
   image_url: "",
+  custom_rules: "",
 } satisfies TileEditorState;
 
 function AdminTileCard({
@@ -144,6 +146,12 @@ export default function AdminPage() {
   const [teamNameStatus, setTeamNameStatus] = useState<Record<number, "saving" | "saved" | "error" | "">>({});
   const teamNameTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const [teamPhotoStatus, setTeamPhotoStatus] = useState<Record<number, "saving" | "saved" | "error" | "">>({});
+  const [teamPetStatus, setTeamPetStatus] = useState<Record<number, "saving" | "saved" | "error" | "">>({});
+  const [petNames, setPetNames] = useState<Record<number, string>>({});
+  const [dropTeamFilter, setDropTeamFilter] = useState("all");
+  const [dropPlayerFilter, setDropPlayerFilter] = useState("all");
+  const [dropTileFilter, setDropTileFilter] = useState("all");
+  const [dropSearch, setDropSearch] = useState("");
 
   async function fetchAdminData() {
     const [gameResponse, tilesResponse, dropsResponse] = await Promise.all([
@@ -173,6 +181,7 @@ export default function AdminPage() {
     setProgressTiles(data.tiles);
     setDropRows(data.drops);
     setTeamNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.name])));
+    setPetNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.pet_name ?? ""])));
     setPetTeamId(data.gamePayload.teams[0]?.id ?? 1);
     // Pre-fill the schedule input if a schedule already exists
     if (data.gamePayload.game.scheduled_start_at) {
@@ -197,6 +206,7 @@ export default function AdminPage() {
         setProgressTiles(data.tiles);
         setDropRows(data.drops);
         setTeamNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.name])));
+        setPetNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.pet_name ?? ""])));
         setPetTeamId(data.gamePayload.teams[0]?.id ?? 1);
       } catch (loadError) {
         if (!cancelled) {
@@ -232,6 +242,32 @@ export default function AdminPage() {
       : incompletePetTiles[0]?.tile.id
         ? String(incompletePetTiles[0].tile.id)
         : "";
+  const selectedPetTeam = gameData?.teams.find((team) => team.id === petTeamId) ?? null;
+  const currentPetAward = progressTiles.find((entry) => {
+    const progress = entry.team1.team_id === petTeamId ? entry.team1 : entry.team2;
+    return progress.pet_completed;
+  });
+  const dropPlayers = useMemo(
+    () => [...new Set(dropRows.map((drop) => drop.player_username))].sort((a, b) => a.localeCompare(b)),
+    [dropRows],
+  );
+  const dropTiles = useMemo(
+    () => [...new Map(dropRows.map((drop) => [drop.tile_id, drop])).values()]
+      .sort((a, b) => a.tile_position - b.tile_position),
+    [dropRows],
+  );
+  const filteredDropRows = useMemo(() => {
+    const query = dropSearch.trim().toLowerCase();
+    return dropRows.filter((drop) => {
+      if (dropTeamFilter !== "all" && String(drop.team_id) !== dropTeamFilter) return false;
+      if (dropPlayerFilter !== "all" && drop.player_username !== dropPlayerFilter) return false;
+      if (dropTileFilter !== "all" && String(drop.tile_id) !== dropTileFilter) return false;
+      if (!query) return true;
+      return `${drop.player_username} ${drop.team_name} ${drop.tile_name} ${drop.tile_position}`
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [dropPlayerFilter, dropRows, dropSearch, dropTeamFilter, dropTileFilter]);
 
   function editTile(position: number) {
     isOpeningTile.current = true;
@@ -250,6 +286,7 @@ export default function AdminPage() {
         skill_name: existing.skill_name ?? "attack",
         required_xp: existing.required_xp ?? 100000,
         image_url: existing.image_url ?? "",
+        custom_rules: existing.custom_rules ?? "",
       });
       return;
     }
@@ -364,6 +401,32 @@ export default function AdminPage() {
     }
   }
 
+  async function handleTeamPetUpload(teamId: number, petName: string, file: File | null) {
+    if (!file) return;
+    setTeamPetStatus((s) => ({ ...s, [teamId]: "saving" }));
+    try {
+      const formData = new FormData();
+      formData.append("type", "team-photo");
+      formData.append("file", file);
+
+      const uploadResponse = await fetch("/api/upload", { method: "POST", body: formData });
+      const uploadPayload = (await uploadResponse.json()) as { key?: string; error?: string };
+      if (!uploadResponse.ok || !uploadPayload.key) throw new Error(uploadPayload.error ?? "Failed to upload pet photo.");
+
+      const response = await fetch(`/api/teams/${teamId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pet_image_url: uploadPayload.key, pet_name: petName.trim() || null }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Failed to save pet.");
+      setTeamPetStatus((s) => ({ ...s, [teamId]: "saved" }));
+      await fetchAdminData();
+    } catch {
+      setTeamPetStatus((s) => ({ ...s, [teamId]: "error" }));
+    }
+  }
+
   async function handleAddPlayer(teamId: number) {
     const username = (newPlayers[teamId] ?? "").trim();
     if (!username) {
@@ -410,6 +473,7 @@ export default function AdminPage() {
       skill_name: snapshot.type === "xp" ? snapshot.skill_name : null,
       required_xp: snapshot.type === "xp" ? Number(snapshot.required_xp) : null,
       image_url: snapshot.image_url.trim() || null,
+      custom_rules: snapshot.custom_rules.trim() || null,
     };
 
     const isExisting = snapshot.id > 0;
@@ -700,6 +764,35 @@ export default function AdminPage() {
                   <input className="osrs-input" type="file" accept="image/*" onChange={(event) => void handleTeamPhotoUpload(team.id, event.target.files?.[0] ?? null)} />
                 </label>
 
+                {/* Pet proof */}
+                <div className="mb-4 rounded border border-yellow-700/40 bg-yellow-950/30 p-3">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-sm font-semibold text-yellow-200">🐾 Pet Proof</span>
+                    <span className="text-xs text-osrs-text-muted">
+                      {teamPetStatus[team.id] === "saving" ? "Uploading…" : teamPetStatus[team.id] === "saved" ? "✓ Saved" : teamPetStatus[team.id] === "error" ? "Error" : ""}
+                    </span>
+                  </div>
+                  {team.pet_image_url && (
+                    <div className="mb-2 text-xs text-osrs-text-muted">
+                      Proof on file: <span className="text-osrs-text">{team.pet_name || "unnamed pet"}</span>
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-2">
+                    <input
+                      className="osrs-input"
+                      placeholder="Pet name (e.g. Jal-nib-rek)"
+                      value={petNames[team.id] ?? ""}
+                      onChange={(e) => setPetNames((cur) => ({ ...cur, [team.id]: e.target.value }))}
+                    />
+                    <input
+                      className="osrs-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => void handleTeamPetUpload(team.id, petNames[team.id] ?? "", event.target.files?.[0] ?? null)}
+                    />
+                  </div>
+                </div>
+
                 <div className="mb-2 text-sm font-semibold">Players</div>
                 <div className="mb-4 flex flex-col gap-2">
                   {team.players.length ? team.players.map((player) => (
@@ -894,6 +987,16 @@ export default function AdminPage() {
                   <span className="font-semibold">Image URL / Stored Key <span className="text-xs font-normal text-osrs-text-muted">(optional — auto-filled from boss)</span></span>
                   <input className="osrs-input" value={tileEditor.image_url} onChange={(event) => setTileEditor((current) => ({ ...current, image_url: event.target.value }))} />
                 </label>
+
+                <label className="flex flex-col gap-2 md:col-span-2">
+                  <span className="font-semibold">Custom Rules <span className="text-xs font-normal text-osrs-text-muted">(optional — shown to players on tile click)</span></span>
+                  <textarea
+                    className="osrs-input min-h-20 resize-y"
+                    placeholder="e.g. Must be obtained on-task. Full raid completion required."
+                    value={tileEditor.custom_rules}
+                    onChange={(event) => setTileEditor((current) => ({ ...current, custom_rules: event.target.value }))}
+                  />
+                </label>
               </div>
 
               {tileEditor.id ? (
@@ -912,6 +1015,41 @@ export default function AdminPage() {
       {activeTab === "Drops" && (
         <div className="osrs-panel p-6">
           <h2 className="mb-4 text-xl font-semibold text-osrs-text-bright">Drop Management</h2>
+          <div className="mb-4 grid gap-3 rounded border border-osrs-border bg-osrs-panel-dark p-3 sm:grid-cols-2 lg:grid-cols-5">
+            <input
+              className="osrs-input"
+              placeholder="Search drops…"
+              value={dropSearch}
+              onChange={(event) => setDropSearch(event.target.value)}
+            />
+            <select className="osrs-input" value={dropTeamFilter} onChange={(event) => setDropTeamFilter(event.target.value)}>
+              <option value="all">All teams</option>
+              {gameData?.teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+            </select>
+            <select className="osrs-input" value={dropPlayerFilter} onChange={(event) => setDropPlayerFilter(event.target.value)}>
+              <option value="all">All players</option>
+              {dropPlayers.map((player) => <option key={player} value={player}>{player}</option>)}
+            </select>
+            <select className="osrs-input" value={dropTileFilter} onChange={(event) => setDropTileFilter(event.target.value)}>
+              <option value="all">All tiles</option>
+              {dropTiles.map((drop) => <option key={drop.tile_id} value={drop.tile_id}>#{drop.tile_position} - {drop.tile_name}</option>)}
+            </select>
+            <button
+              type="button"
+              className="osrs-button"
+              onClick={() => {
+                setDropSearch("");
+                setDropTeamFilter("all");
+                setDropPlayerFilter("all");
+                setDropTileFilter("all");
+              }}
+            >
+              Clear Filters
+            </button>
+          </div>
+          <p className="mb-3 text-sm text-osrs-text-muted">
+            Showing {filteredDropRows.length} of {dropRows.length} submissions
+          </p>
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse text-sm">
               <thead>
@@ -925,7 +1063,7 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {dropRows.map((drop) => (
+                {filteredDropRows.map((drop) => (
                   <tr key={drop.id} className="border-b border-osrs-border/50">
                     <td className="px-3 py-2">
                       <a href={resolveStoredImageUrl(drop.image_url)} target="_blank" rel="noreferrer">
@@ -941,14 +1079,14 @@ export default function AdminPage() {
                     </td>
                     <td className="px-3 py-2">{drop.player_username}</td>
                     <td className="px-3 py-2">{drop.team_name}</td>
-                    <td className="px-3 py-2">{drop.tile_name}</td>
-                    <td className="px-3 py-2">{drop.submitted_at}</td>
+                    <td className="px-3 py-2">#{drop.tile_position} {drop.tile_name}</td>
+                    <td className="px-3 py-2">{new Date(drop.submitted_at.includes("T") ? drop.submitted_at : `${drop.submitted_at.replace(" ", "T")}Z`).toLocaleString()}</td>
                     <td className="px-3 py-2"><button type="button" className="osrs-button" onClick={() => void handleDeleteDrop(drop.id)}>Delete</button></td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {!dropRows.length ? <div className="py-4 text-osrs-text-muted">No drops logged yet.</div> : null}
+            {!filteredDropRows.length ? <div className="py-4 text-osrs-text-muted">No drops match the current filters.</div> : null}
           </div>
         </div>
       )}
@@ -957,6 +1095,31 @@ export default function AdminPage() {
       {activeTab === "Pets" && (
         <div className="osrs-panel p-6">
           <h2 className="mb-4 text-xl font-semibold text-osrs-text-bright">Pet Tile Award</h2>
+          <div className={`mb-4 rounded border p-4 ${selectedPetTeam?.pet_image_url ? "border-yellow-700 bg-yellow-950/30" : "border-osrs-border bg-osrs-panel-dark"}`}>
+            {selectedPetTeam?.pet_image_url ? (
+              <>
+                <div className="font-semibold text-yellow-200">Proof logged</div>
+                <div className="text-sm text-osrs-text-muted">
+                  {selectedPetTeam.pet_obtained_by ?? "Unknown player"}
+                  {selectedPetTeam.pet_name ? ` — ${selectedPetTeam.pet_name}` : ""}
+                </div>
+                {currentPetAward ? (
+                  <div className="mt-2 text-sm text-osrs-gold">
+                    Currently awarded to #{currentPetAward.tile.position} {getTileDisplayName(currentPetAward.tile)}
+                  </div>
+                ) : (
+                  <div className="mt-2 text-sm text-yellow-100">Awaiting tile selection</div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="font-semibold">No pet proof logged</div>
+                <div className="text-sm text-osrs-text-muted">
+                  Submit proof from the team board or upload it in Team Management before awarding a tile.
+                </div>
+              </>
+            )}
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="flex flex-col gap-2">
               <span className="font-semibold">Team</span>
@@ -982,7 +1145,14 @@ export default function AdminPage() {
               </select>
             </label>
           </div>
-          <button type="button" className="osrs-button mt-4" onClick={() => void handleAwardPetTile()}>Award Pet Tile</button>
+          <button
+            type="button"
+            className="osrs-button mt-4"
+            disabled={saving || !selectedPetTeam?.pet_image_url || !effectivePetTileId}
+            onClick={() => void handleAwardPetTile()}
+          >
+            {currentPetAward ? "Move Pet Award" : "Award Pet Tile"}
+          </button>
         </div>
       )}
     </div>

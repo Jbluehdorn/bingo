@@ -13,6 +13,7 @@ function validateTilePayload(body: {
   skill_name?: string | null;
   required_xp?: number | null;
   image_url?: string | null;
+  custom_rules?: string | null;
 }) {
   const position = Number(body.position);
   if (!position || position < 1 || position > 25) return "Position must be between 1 and 25.";
@@ -41,6 +42,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
       skill_name?: string | null;
       required_xp?: number | null;
       image_url?: string | null;
+      custom_rules?: string | null;
     };
 
     const validationError = validateTilePayload(body);
@@ -49,7 +51,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const env = await getEnv();
     await env.DB.prepare(`
       UPDATE tiles
-      SET position = ?, type = ?, display_title = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?
+      SET position = ?, type = ?, display_title = ?, boss_name = ?, required_drops = ?, accepted_drops = ?, skill_name = ?, required_xp = ?, image_url = ?, custom_rules = ?
       WHERE id = ?
     `).bind(
       Number(body.position),
@@ -61,6 +63,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
       body.type === "xp" ? body.skill_name?.trim().toLowerCase() ?? null : null,
       body.type === "xp" ? Number(body.required_xp) : null,
       body.image_url?.trim() ?? null,
+      body.custom_rules?.trim() ?? null,
       tileId,
     ).run();
 
