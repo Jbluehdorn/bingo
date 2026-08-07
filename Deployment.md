@@ -34,7 +34,7 @@ The dev server supports hot reload. Local D1 data persists in `.wrangler/state/`
 
 ---
 
-## Deploying to Cloudflare Pages
+## Deploying to Cloudflare Workers
 
 ### One-time Cloudflare setup
 
@@ -82,7 +82,7 @@ npm run db:migrate:remote
 npm run deploy
 ```
 
-This builds the app with the OpenNext Cloudflare adapter and deploys it to Cloudflare Pages. The URL will be printed at the end of the output.
+This builds the app with the OpenNext Cloudflare adapter and deploys it to Cloudflare Workers. The URL will be printed at the end of the output.
 
 ### Re-deploying after code changes
 
