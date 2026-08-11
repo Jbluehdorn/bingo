@@ -7,7 +7,10 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "clean:open-next": "rimraf .open-next",
+    "prepreview": "npm run clean:open-next",
     "preview": "opennextjs-cloudflare build && wrangler dev",
+    "predeploy": "npm run clean:open-next",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
     "db:migrate:local": "wrangler d1 migrations apply bingo-db --local",
@@ -28,6 +31,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "rimraf": "^5.0.10",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.105.0"
