@@ -10,7 +10,7 @@ import {
   type Tile,
   type TileWithProgress,
 } from "@/lib/types";
-import { getPlayerXpGained, updatePlayer } from "@/lib/wom";
+import { getPlayerXpGained } from "@/lib/wom";
 
 const XP_CACHE_TTL_MS = 15 * 60 * 1000;
 
@@ -217,7 +217,6 @@ export async function computeAllTilesProgress(
         }
 
         try {
-          await updatePlayer(player.username);
           return {
             playerId: player.id,
             xp: await getPlayerXpGained(player.username, startedAt),

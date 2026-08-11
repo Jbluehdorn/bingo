@@ -54,13 +54,3 @@ export async function getPlayerXpGained(username: string, startDate: string): Pr
     OSRS_SKILLS.map((skill) => [skill, Math.max(0, Number(skills[skill]?.experience?.gained ?? 0))]),
   );
 }
-
-export async function updatePlayer(username: string): Promise<void> {
-  const response = await fetch(getPlayerUrl(username.trim()), { method: "POST" });
-  if (response.status === 429) {
-    return;
-  }
-  if (!response.ok) {
-    throw new Error(`Unable to update WOM data for ${username}.`);
-  }
-}
