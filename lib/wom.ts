@@ -36,7 +36,8 @@ export async function getPlayerXp(username: string): Promise<Record<string, numb
 
 /** Returns XP gained per skill since startDate (ISO string). Uses WOM /gained endpoint. */
 export async function getPlayerXpGained(username: string, startDate: string): Promise<Record<string, number>> {
-  const url = `${getPlayerUrl(username.trim())}/gained?startDate=${encodeURIComponent(startDate)}`;
+  const endDate = new Date().toISOString();
+  const url = `${getPlayerUrl(username.trim())}/gained?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
   const response = await fetch(url, { method: "GET" });
   if (!response.ok) {
     throw new Error(`Unable to fetch WOM gains for ${username}.`);

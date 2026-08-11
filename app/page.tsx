@@ -117,6 +117,7 @@ export default async function HomePage() {
         <BoardDisplay
           teams={orderedTeams as [typeof orderedTeams[number], typeof orderedTeams[number]]}
           tiles={progress}
+          petTileRules={game.pet_tile_rules}
         />
       ) : (
         <div className="osrs-panel p-6 text-center text-osrs-text-muted">

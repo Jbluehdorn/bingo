@@ -1,15 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import { getEnv } from "@/lib/cloudflare";
-import { checkForWinner, computeAllTilesProgress, getGame, getPlayers, getTiles } from "@/lib/db";
-import { updatePlayer } from "@/lib/wom";
+import { checkForWinner, computeAllTilesProgress, getGame, getTiles } from "@/lib/db";
 
 export async function GET() {
   try {
     const env = await getEnv();
-    const [game, players, tiles] = await Promise.all([
+    const [game, tiles] = await Promise.all([
       getGame(env.DB),
-      getPlayers(env.DB),
       getTiles(env.DB),
     ]);
 
@@ -20,10 +18,6 @@ export async function GET() {
     const xpTiles = tiles.filter((tile) => tile.type === "xp");
     if (!xpTiles.length) {
       return Response.json({ tiles: [] });
-    }
-
-    for (const player of players) {
-      await updatePlayer(player.username);
     }
 
     const progress = await computeAllTilesProgress(env.DB, xpTiles);

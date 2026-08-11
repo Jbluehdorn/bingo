@@ -1,15 +1,24 @@
-import type {
-  DropSubmission,
-  DropSubmissionWithDetails,
-  Game,
-  PetCompletion,
-  Player,
-  Team,
-  TeamTileProgress,
-  Tile,
-  TileWithProgress,
+import {
+  getTileDisplayName,
+  type DropSubmission,
+  type DropSubmissionWithDetails,
+  type Game,
+  type PetCompletion,
+  type Player,
+  type Team,
+  type TeamTileProgress,
+  type Tile,
+  type TileWithProgress,
 } from "@/lib/types";
 import { getPlayerXpGained, updatePlayer } from "@/lib/wom";
+
+const XP_CACHE_TTL_MS = 15 * 60 * 1000;
+
+interface XpProgressCacheRow {
+  player_id: number;
+  xp_by_skill: string;
+  fetched_at: string;
+}
 
 function allResults<T>(statement: D1PreparedStatement): Promise<T[]> {
   return statement.all<T>().then((result) => result.results ?? []);
@@ -17,6 +26,19 @@ function allResults<T>(statement: D1PreparedStatement): Promise<T[]> {
 
 function buildInClause(size: number): string {
   return Array.from({ length: size }, () => "?").join(", ");
+}
+
+function parseCachedXp(value: string): Record<string, number> | null {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+
+    return Object.fromEntries(
+      Object.entries(parsed).filter((entry): entry is [string, number] => typeof entry[1] === "number"),
+    );
+  } catch {
+    return null;
+  }
 }
 
 export async function getGame(db: D1Database): Promise<Game> {
@@ -89,7 +111,7 @@ export async function getDropSubmissionsWithDetails(
         tile.position AS tile_position,
         CASE
           WHEN tile.type = 'drop' THEN COALESCE(tile.display_title, tile.boss_name, 'Drop Tile')
-          ELSE COALESCE(tile.skill_name, 'XP Tile')
+          ELSE COALESCE(tile.display_title, tile.skill_name, 'XP Tile')
         END AS tile_name
       FROM drop_submissions ds
       INNER JOIN players p ON p.id = ds.player_id
@@ -111,6 +133,7 @@ function buildEmptyProgress(teamId: number): TeamTileProgress {
     pet_completed: false,
     current_drops: 0,
     current_xp: 0,
+    xp_gains: [],
     contributors: [],
     drop_images: [],
   };
@@ -171,20 +194,61 @@ export async function computeAllTilesProgress(
 
   // Fetch XP gained since game start from WOM for all players (only if game is active and has XP tiles)
   const xpGainedByPlayer = new Map<number, Record<string, number>>();
-  const startedAt = game.status === "active" && game.started_at ? game.started_at : null;
+  const startedAt = game.status !== "setup" && game.started_at ? game.started_at : null;
   if (startedAt && tiles.some((tile) => tile.type === "xp") && players.length > 0) {
+    const cachedRows = await allResults<XpProgressCacheRow>(
+      db
+        .prepare(`
+          SELECT player_id, xp_by_skill, fetched_at
+          FROM xp_progress_cache
+          WHERE started_at = ? AND player_id IN (${buildInClause(players.length)})
+        `)
+        .bind(startedAt, ...players.map((player) => player.id)),
+    );
+    const cacheByPlayer = new Map(cachedRows.map((row) => [row.player_id, row]));
+    const freshAfter = Date.now() - XP_CACHE_TTL_MS;
+
     const xpResults = await Promise.all(
       players.map(async (player) => {
+        const cached = cacheByPlayer.get(player.id);
+        const cachedXp = cached ? parseCachedXp(cached.xp_by_skill) : null;
+        if (cached && cachedXp && Date.parse(cached.fetched_at) >= freshAfter) {
+          return { playerId: player.id, xp: cachedXp, shouldCache: false };
+        }
+
         try {
           await updatePlayer(player.username);
-          return [player.id, await getPlayerXpGained(player.username, startedAt)] as const;
+          return {
+            playerId: player.id,
+            xp: await getPlayerXpGained(player.username, startedAt),
+            shouldCache: true,
+          };
         } catch {
-          return [player.id, {}] as const;
+          return { playerId: player.id, xp: cachedXp ?? {}, shouldCache: false };
         }
       }),
     );
-    for (const [playerId, xp] of xpResults) {
-      xpGainedByPlayer.set(playerId, xp);
+
+    const fetchedAt = new Date().toISOString();
+    const cacheUpdates = xpResults
+      .filter((result) => result.shouldCache)
+      .map((result) =>
+        db
+          .prepare(`
+            INSERT INTO xp_progress_cache (player_id, started_at, xp_by_skill, fetched_at)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(player_id, started_at) DO UPDATE SET
+              xp_by_skill = excluded.xp_by_skill,
+              fetched_at = excluded.fetched_at
+          `)
+          .bind(result.playerId, startedAt, JSON.stringify(result.xp), fetchedAt),
+      );
+    if (cacheUpdates.length > 0) {
+      await db.batch(cacheUpdates);
+    }
+
+    for (const result of xpResults) {
+      xpGainedByPlayer.set(result.playerId, result.xp);
     }
   }
 
@@ -194,11 +258,16 @@ export async function computeAllTilesProgress(
       const currentDrops = dropCountMap.get(`${tile.id}:${teamId}`) ?? 0;
 
       let currentXp = 0;
+      let xpGains: TeamTileProgress["xp_gains"] = [];
       if (tile.type === "xp" && tile.skill_name && startedAt) {
         const skillName = tile.skill_name.toLowerCase();
-        currentXp = (teamPlayers.get(teamId) ?? []).reduce((total, player) => {
-          return total + (xpGainedByPlayer.get(player.id)?.[skillName] ?? 0);
-        }, 0);
+        xpGains = (teamPlayers.get(teamId) ?? [])
+          .map((player) => ({
+            player: player.username,
+            xp: xpGainedByPlayer.get(player.id)?.[skillName] ?? 0,
+          }))
+          .sort((a, b) => b.xp - a.xp || a.player.localeCompare(b.player));
+        currentXp = xpGains.reduce((total, gain) => total + gain.xp, 0);
       }
 
       const dropComplete =
@@ -211,6 +280,7 @@ export async function computeAllTilesProgress(
         pet_completed: petCompleted,
         current_drops: currentDrops,
         current_xp: currentXp,
+        xp_gains: xpGains,
         contributors: dropContributorsMap.get(`${tile.id}:${teamId}`) ?? [],
         drop_images: dropImagesMap.get(`${tile.id}:${teamId}`) ?? [],
       };
@@ -253,5 +323,5 @@ export async function checkForWinner(db: D1Database): Promise<number | null> {
 }
 
 export function getTileName(tile: Tile): string {
-  return tile.type === "drop" ? tile.boss_name ?? "Drop Tile" : tile.skill_name ?? "XP Tile";
+  return getTileDisplayName(tile);
 }

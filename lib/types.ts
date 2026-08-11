@@ -32,6 +32,7 @@ export interface Game {
   status: GameStatus;
   started_at: string | null;
   scheduled_start_at: string | null;
+  pet_tile_rules: string | null;
   winner_team_id: number | null;
   created_at: string;
 }
@@ -142,6 +143,7 @@ export interface TeamTileProgress {
   pet_completed: boolean;
   current_drops: number;
   current_xp: number;
+  xp_gains: { player: string; xp: number }[];
   contributors: string[]; // usernames of players who logged drops for this tile
   drop_images: { url: string; player: string }[]; // screenshots in chronological order
 }

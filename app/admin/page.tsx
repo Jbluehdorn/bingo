@@ -148,6 +148,7 @@ export default function AdminPage() {
   const [teamPhotoStatus, setTeamPhotoStatus] = useState<Record<number, "saving" | "saved" | "error" | "">>({});
   const [teamPetStatus, setTeamPetStatus] = useState<Record<number, "saving" | "saved" | "error" | "">>({});
   const [petNames, setPetNames] = useState<Record<number, string>>({});
+  const [petTileRules, setPetTileRules] = useState("");
   const [dropTeamFilter, setDropTeamFilter] = useState("all");
   const [dropPlayerFilter, setDropPlayerFilter] = useState("all");
   const [dropTileFilter, setDropTileFilter] = useState("all");
@@ -182,6 +183,7 @@ export default function AdminPage() {
     setDropRows(data.drops);
     setTeamNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.name])));
     setPetNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.pet_name ?? ""])));
+    setPetTileRules(data.gamePayload.game.pet_tile_rules ?? "");
     setPetTeamId(data.gamePayload.teams[0]?.id ?? 1);
     // Pre-fill the schedule input if a schedule already exists
     if (data.gamePayload.game.scheduled_start_at) {
@@ -207,6 +209,7 @@ export default function AdminPage() {
         setDropRows(data.drops);
         setTeamNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.name])));
         setPetNames(Object.fromEntries((data.gamePayload.teams ?? []).map((team) => [team.id, team.pet_name ?? ""])));
+        setPetTileRules(data.gamePayload.game.pet_tile_rules ?? "");
         setPetTeamId(data.gamePayload.teams[0]?.id ?? 1);
       } catch (loadError) {
         if (!cancelled) {
@@ -598,6 +601,19 @@ export default function AdminPage() {
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Failed to award pet tile.");
       setMessage(payload.message ?? "Pet tile awarded.");
+    });
+  }
+
+  async function handleSavePetTileRules() {
+    await runAction(async () => {
+      const response = await fetch("/api/game", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pet_tile_rules: petTileRules.trim() || null }),
+      });
+      const payload = (await response.json()) as { error?: string; message?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Failed to save pet tile rules.");
+      setMessage(payload.message ?? "Pet tile rules saved.");
     });
   }
 
@@ -1095,6 +1111,25 @@ export default function AdminPage() {
       {activeTab === "Pets" && (
         <div className="osrs-panel p-6">
           <h2 className="mb-4 text-xl font-semibold text-osrs-text-bright">Pet Tile Award</h2>
+          <div className="mb-4 rounded border border-osrs-border bg-osrs-panel-dark p-4">
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold">Bonus Pet Tile Rules</span>
+              <textarea
+                className="osrs-input min-h-24 resize-y"
+                placeholder="Describe which pets qualify and any proof requirements."
+                value={petTileRules}
+                onChange={(event) => setPetTileRules(event.target.value)}
+              />
+            </label>
+            <button
+              type="button"
+              className="osrs-button mt-3"
+              disabled={saving}
+              onClick={() => void handleSavePetTileRules()}
+            >
+              Save Pet Tile Rules
+            </button>
+          </div>
           <div className={`mb-4 rounded border p-4 ${selectedPetTeam?.pet_image_url ? "border-yellow-700 bg-yellow-950/30" : "border-osrs-border bg-osrs-panel-dark"}`}>
             {selectedPetTeam?.pet_image_url ? (
               <>
@@ -1141,7 +1176,7 @@ export default function AdminPage() {
                 value={effectivePetTileId}
                 onChange={(event) => setPetTileId(event.target.value)}
               >
-                {incompletePetTiles.length ? incompletePetTiles.map((entry) => <option key={entry.tile.id} value={entry.tile.id}>#{entry.tile.position} - {entry.tile.type === "drop" ? entry.tile.boss_name : entry.tile.skill_name}</option>) : <option value="">No incomplete tiles</option>}
+                {incompletePetTiles.length ? incompletePetTiles.map((entry) => <option key={entry.tile.id} value={entry.tile.id}>#{entry.tile.position} - {getTileDisplayName(entry.tile)}</option>) : <option value="">No incomplete tiles</option>}
               </select>
             </label>
           </div>

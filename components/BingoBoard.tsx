@@ -12,6 +12,7 @@ interface BingoBoardProps {
   tiles: TileWithProgress[];
   team: TeamWithPlayers;
   teamIndex: 0 | 1;
+  petTileRules: string | null;
 }
 
 function formatNumber(value: number): string {
@@ -158,6 +159,34 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
             </div>
           )}
 
+          {tile.type === "xp" && (
+            <div>
+              <div className="mb-2 text-sm font-semibold text-osrs-text-bright">
+                Individual XP Gains
+              </div>
+              {progress.xp_gains.length > 0 ? (
+                <ol className="flex flex-col gap-1">
+                  {progress.xp_gains.map((gain, index) => (
+                    <li
+                      key={gain.player}
+                      className="flex items-center justify-between gap-4 rounded border border-osrs-border bg-osrs-panel-dark px-3 py-2 text-sm"
+                    >
+                      <span className="min-w-0 truncate text-osrs-text">
+                        <span className="mr-2 text-xs text-osrs-text-muted">{index + 1}.</span>
+                        {gain.player}
+                      </span>
+                      <span className="shrink-0 font-semibold text-osrs-text-bright">
+                        {formatNumber(gain.xp)} xp
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="text-sm text-osrs-text-muted">No player XP gains are available yet.</p>
+              )}
+            </div>
+          )}
+
           {/* Accepted drops */}
           {tile.type === "drop" && acceptedDrops.length > 0 && (
             <div>
@@ -179,13 +208,15 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
 
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-osrs-border p-4">
-          <Link
-            href={`/log-drop?team=${teamId}`}
-            className="osrs-button text-sm"
-            onClick={onClose}
-          >
-            Log a Drop
-          </Link>
+          {tile.type === "drop" ? (
+            <Link
+              href={`/log-drop?team=${teamId}`}
+              className="osrs-button text-sm"
+              onClick={onClose}
+            >
+              Log a Drop
+            </Link>
+          ) : <span />}
           <button type="button" onClick={onClose} className="text-sm text-osrs-text-muted hover:text-osrs-text">
             Close
           </button>
@@ -259,7 +290,7 @@ function BoardMiniTile({
   );
 }
 
-export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) {
+export default function BingoBoard({ tiles, team, teamIndex, petTileRules }: BingoBoardProps) {
   const teamTiles = tiles.map((tile) => (teamIndex === 0 ? tile.team1 : tile.team2));
   const completeCount = teamTiles.filter((tile) => tile.is_complete).length;
   const storageKey = `board-collapsed-${team.id}`;
@@ -388,6 +419,11 @@ export default function BingoBoard({ tiles, team, teamIndex }: BingoBoardProps) 
                   ) : (
                     <p className="text-sm text-osrs-text-muted italic">No pet proof logged</p>
                   )}
+                  {petTileRules ? (
+                    <p className="mt-1 whitespace-pre-wrap text-xs text-osrs-text-muted">
+                      {petTileRules}
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <Link href={`/log-pet?team=${team.id}`} className="osrs-button shrink-0 text-sm">

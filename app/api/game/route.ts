@@ -32,3 +32,20 @@ export async function GET() {
     return Response.json({ error: error instanceof Error ? error.message : "Failed to load game." }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const env = await getEnv();
+    const body = (await request.json()) as { pet_tile_rules?: string | null };
+
+    if (body.pet_tile_rules === undefined) {
+      return Response.json({ error: "pet_tile_rules is required." }, { status: 400 });
+    }
+
+    const petTileRules = body.pet_tile_rules?.trim() || null;
+    await env.DB.prepare("UPDATE game SET pet_tile_rules = ? WHERE id = 1").bind(petTileRules).run();
+    return Response.json({ message: "Pet tile rules updated successfully." });
+  } catch (error) {
+    return Response.json({ error: error instanceof Error ? error.message : "Failed to update game." }, { status: 500 });
+  }
+}

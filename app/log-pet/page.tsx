@@ -3,7 +3,7 @@
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-import type { TeamWithPlayers } from "@/lib/types";
+import type { Game, TeamWithPlayers } from "@/lib/types";
 
 interface LogPetPageProps {
   searchParams: Promise<{ team?: string | string[] | undefined }>;
@@ -21,16 +21,23 @@ export default function LogPetPage({ searchParams }: LogPetPageProps) {
   const [error, setError] = useState("");
   const [successPlayer, setSuccessPlayer] = useState("");
   const [successTeam, setSuccessTeam] = useState("");
+  const [petTileRules, setPetTileRules] = useState("");
 
   useEffect(() => {
     async function load() {
       try {
-        const response = await fetch("/api/teams");
-        const payload = (await response.json()) as { teams?: TeamWithPlayers[]; error?: string };
-        if (!response.ok) throw new Error(payload.error ?? "Failed to load teams.");
+        const [teamsResponse, gameResponse] = await Promise.all([
+          fetch("/api/teams"),
+          fetch("/api/game"),
+        ]);
+        const payload = (await teamsResponse.json()) as { teams?: TeamWithPlayers[]; error?: string };
+        const gamePayload = (await gameResponse.json()) as { game?: Game; error?: string };
+        if (!teamsResponse.ok) throw new Error(payload.error ?? "Failed to load teams.");
+        if (!gameResponse.ok) throw new Error(gamePayload.error ?? "Failed to load pet tile rules.");
 
         const loadedTeams = payload.teams ?? [];
         setTeams(loadedTeams);
+        setPetTileRules(gamePayload.game?.pet_tile_rules ?? "");
 
         const validTeamId = loadedTeams.some((t) => t.id === requestedTeamId)
           ? requestedTeamId
@@ -132,6 +139,7 @@ export default function LogPetPage({ searchParams }: LogPetPageProps) {
 
       <div className="osrs-panel rounded border border-osrs-border px-4 py-3 text-sm text-osrs-text-muted">
         🏆 <span className="font-semibold text-osrs-text-bright">Bonus Pet Tile</span> — proof is logged here; the admin selects the tile it completes.
+        {petTileRules ? <p className="mt-2 whitespace-pre-wrap text-osrs-text">{petTileRules}</p> : null}
       </div>
 
       <form className="osrs-panel flex flex-col gap-4 p-5" onSubmit={handleSubmit}>

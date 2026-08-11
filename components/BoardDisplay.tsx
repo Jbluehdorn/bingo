@@ -9,9 +9,10 @@ import type { TeamWithPlayers, TileWithProgress } from "@/lib/types";
 interface BoardDisplayProps {
   teams: [TeamWithPlayers, TeamWithPlayers];
   tiles: TileWithProgress[];
+  petTileRules: string | null;
 }
 
-export default function BoardDisplay({ teams, tiles }: BoardDisplayProps) {
+export default function BoardDisplay({ teams, tiles, petTileRules }: BoardDisplayProps) {
   const [view, setView] = useState<"teams" | "comparison">("teams");
 
   return (
@@ -46,7 +47,13 @@ export default function BoardDisplay({ teams, tiles }: BoardDisplayProps) {
       {view === "teams" ? (
         <div className="grid gap-6 xl:grid-cols-2">
           {teams.map((team, index) => (
-            <BingoBoard key={team.id} tiles={tiles} team={team} teamIndex={index as 0 | 1} />
+            <BingoBoard
+              key={team.id}
+              tiles={tiles}
+              team={team}
+              teamIndex={index as 0 | 1}
+              petTileRules={petTileRules}
+            />
           ))}
         </div>
       ) : (
