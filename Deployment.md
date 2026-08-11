@@ -84,7 +84,7 @@ npm run deploy
 
 This first removes any stale OpenNext output, then builds the app with the OpenNext Cloudflare adapter and deploys it to Cloudflare Workers. The URL will be printed at the end of the output.
 
-On native Windows, stop any running Wrangler or Next.js development process before deploying so it does not hold files in `.open-next` open. WSL remains the most reliable environment for OpenNext builds.
+On Windows, the deploy command retries removal of stale `.open-next` build output to tolerate temporary file locks. If cleanup still fails with `EPERM`, stop any running `next`, `wrangler`, or OpenNext processes using this project and run the command again. WSL remains the most reliable environment for OpenNext builds.
 
 ### Re-deploying after code changes
 
