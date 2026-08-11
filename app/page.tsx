@@ -1,7 +1,5 @@
 export const dynamic = "force-dynamic";
 
-import Link from "next/link";
-
 import BoardDisplay from "@/components/BoardDisplay";
 import StartCountdown from "@/components/StartCountdown";
 import { getEnv } from "@/lib/cloudflare";
@@ -124,12 +122,6 @@ export default async function HomePage() {
           Configure all 25 tiles in the admin panel to see the live boards.
         </div>
       )}
-
-      <div className="flex justify-center">
-        <Link href="/" className="osrs-button inline-flex items-center gap-2">
-          ↻ Refresh Progress
-        </Link>
-      </div>
     </div>
   );
 }

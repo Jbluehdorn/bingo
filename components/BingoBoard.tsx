@@ -35,6 +35,7 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
   const acceptedDrops = useMemo(() => parseTileAcceptedDrops(tile), [tile]);
   const displayName = getTileDisplayName(tile);
   const images = progress.drop_images;
+  const positiveXpGains = progress.xp_gains.filter((gain) => gain.xp > 0);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -164,9 +165,9 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
               <div className="mb-2 text-sm font-semibold text-osrs-text-bright">
                 Individual XP Gains
               </div>
-              {progress.xp_gains.length > 0 ? (
+              {positiveXpGains.length > 0 ? (
                 <ol className="flex flex-col gap-1">
-                  {progress.xp_gains.map((gain, index) => (
+                  {positiveXpGains.map((gain, index) => (
                     <li
                       key={gain.player}
                       className="flex items-center justify-between gap-4 rounded border border-osrs-border bg-osrs-panel-dark px-3 py-2 text-sm"

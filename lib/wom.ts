@@ -57,6 +57,9 @@ export async function getPlayerXpGained(username: string, startDate: string): Pr
 
 export async function updatePlayer(username: string): Promise<void> {
   const response = await fetch(getPlayerUrl(username.trim()), { method: "POST" });
+  if (response.status === 429) {
+    return;
+  }
   if (!response.ok) {
     throw new Error(`Unable to update WOM data for ${username}.`);
   }

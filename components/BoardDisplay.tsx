@@ -14,6 +14,27 @@ interface BoardDisplayProps {
 
 export default function BoardDisplay({ teams, tiles, petTileRules }: BoardDisplayProps) {
   const [view, setView] = useState<"teams" | "comparison">("teams");
+  const [displayTiles, setDisplayTiles] = useState(tiles);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState("");
+
+  async function refreshXpProgress() {
+    setRefreshing(true);
+    setRefreshError("");
+
+    try {
+      const response = await fetch("/api/xp-progress", { cache: "no-store" });
+      const payload = (await response.json()) as { tiles?: TileWithProgress[]; error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Failed to refresh XP progress.");
+
+      const refreshedById = new Map((payload.tiles ?? []).map((entry) => [entry.tile.id, entry]));
+      setDisplayTiles((current) => current.map((entry) => refreshedById.get(entry.tile.id) ?? entry));
+    } catch (error) {
+      setRefreshError(error instanceof Error ? error.message : "Failed to refresh XP progress.");
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -49,7 +70,7 @@ export default function BoardDisplay({ teams, tiles, petTileRules }: BoardDispla
           {teams.map((team, index) => (
             <BingoBoard
               key={team.id}
-              tiles={tiles}
+              tiles={displayTiles}
               team={team}
               teamIndex={index as 0 | 1}
               petTileRules={petTileRules}
@@ -65,7 +86,7 @@ export default function BoardDisplay({ teams, tiles, petTileRules }: BoardDispla
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-            {tiles.map((entry) => (
+            {displayTiles.map((entry) => (
               <TileCard
                 key={entry.tile.id}
                 tile={entry.tile}
@@ -77,6 +98,18 @@ export default function BoardDisplay({ teams, tiles, petTileRules }: BoardDispla
           </div>
         </section>
       )}
+
+      <div className="flex flex-col items-center gap-2">
+        <button
+          type="button"
+          className="osrs-button"
+          disabled={refreshing}
+          onClick={() => void refreshXpProgress()}
+        >
+          {refreshing ? "Refreshing XP…" : "↻ Refresh XP Progress"}
+        </button>
+        {refreshError ? <p className="text-sm text-red-400">{refreshError}</p> : null}
+      </div>
     </div>
   );
 }
