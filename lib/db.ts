@@ -222,7 +222,8 @@ export async function computeAllTilesProgress(
             xp: await getPlayerXpGained(player.username, startedAt),
             shouldCache: true,
           };
-        } catch {
+        } catch (error) {
+          console.error(error instanceof Error ? error.message : `Unable to fetch WOM gains for ${player.username}.`);
           return { playerId: player.id, xp: cachedXp ?? {}, shouldCache: false };
         }
       }),

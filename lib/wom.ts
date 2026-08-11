@@ -40,7 +40,8 @@ export async function getPlayerXpGained(username: string, startDate: string): Pr
   const url = `${getPlayerUrl(username.trim())}/gained?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
   const response = await fetch(url, { method: "GET" });
   if (!response.ok) {
-    throw new Error(`Unable to fetch WOM gains for ${username}.`);
+    const details = await response.text();
+    throw new Error(`Unable to fetch WOM gains for ${username}: ${response.status} ${details}`);
   }
 
   const payload = (await response.json()) as {
