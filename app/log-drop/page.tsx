@@ -3,6 +3,7 @@
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
+import { getTileDisplayName } from "@/lib/types";
 import type { TeamWithPlayers, TileWithProgress } from "@/lib/types";
 
 interface LogDropPageProps {
@@ -198,7 +199,7 @@ export default function LogDropPage({ searchParams }: LogDropPageProps) {
             {availableTiles.length ? (
               availableTiles.map((entry) => (
                 <option key={entry.tile.id} value={entry.tile.id}>
-                  #{entry.tile.position} - {entry.tile.boss_name} ({entry.team1.team_id === selectedTeamId
+                  #{entry.tile.position} - {getTileDisplayName(entry.tile)} ({entry.team1.team_id === selectedTeamId
                     ? `${entry.team1.current_drops}/${entry.tile.required_drops ?? 0}`
                     : `${entry.team2.current_drops}/${entry.tile.required_drops ?? 0}`})
                 </option>

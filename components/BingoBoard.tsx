@@ -107,7 +107,13 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
                 Drop Screenshots <span className="font-normal text-osrs-text-muted">({images.length})</span>
               </div>
               <div className="relative overflow-hidden rounded border border-osrs-border bg-osrs-panel-dark">
-                <div className="relative aspect-video w-full">
+                <a
+                  href={resolveStoredImageUrl(images[carouselIndex]!.url)}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Open full screenshot by ${images[carouselIndex]!.player} in a new tab`}
+                  className="relative block aspect-video w-full cursor-zoom-in"
+                >
                   <Image
                     src={resolveStoredImageUrl(images[carouselIndex]!.url)}
                     alt={`Drop by ${images[carouselIndex]!.player}`}
@@ -116,7 +122,7 @@ function TileModal({ entry, progress, progressText, teamId, onClose }: ModalProp
                     className="object-contain"
                     unoptimized
                   />
-                </div>
+                </a>
                 <div className="flex items-center justify-between border-t border-osrs-border px-3 py-2">
                   <button
                     type="button"
