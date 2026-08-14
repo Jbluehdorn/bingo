@@ -317,6 +317,7 @@ export default function BingoBoard({ tiles, team, teamIndex, petTileRules }: Bin
     if (typeof window === "undefined") return false;
     return localStorage.getItem(storageKey) === "true";
   });
+  const [playersExpanded, setPlayersExpanded] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<TileWithProgress | null>(null);
 
   const petProofLogged = !!team.pet_image_url;
@@ -357,9 +358,28 @@ export default function BingoBoard({ tiles, team, teamIndex, petTileRules }: Bin
               {completeCount}/{tiles.length} tiles complete · {dropsLogged}/{totalPossibleDrops} drops logged
             </p>
             {team.players.length > 0 && (
-              <p className="mt-0.5 text-xs text-osrs-text-muted">
-                {team.players.map((p) => p.username).join(" · ")}
-              </p>
+              <div className="relative mt-0.5">
+                <button
+                  type="button"
+                  aria-expanded={playersExpanded}
+                  onClick={() => setPlayersExpanded((expanded) => !expanded)}
+                  className="text-xs text-osrs-text-muted underline decoration-dotted hover:text-osrs-text"
+                >
+                  {playersExpanded ? "Hide" : "Show"} {team.players.length} player{team.players.length === 1 ? "" : "s"}
+                </button>
+                {playersExpanded && (
+                  <div className="absolute left-0 top-full z-20 mt-1 flex min-w-56 max-w-sm flex-wrap gap-1 rounded border border-osrs-border bg-osrs-panel p-2 shadow-xl">
+                    {team.players.map((player) => (
+                      <span
+                        key={player.id}
+                        className="rounded bg-osrs-panel-dark px-2 py-1 text-xs text-osrs-text"
+                      >
+                        {player.username}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
