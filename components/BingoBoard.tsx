@@ -300,6 +300,17 @@ function BoardMiniTile({
 export default function BingoBoard({ tiles, team, teamIndex, petTileRules }: BingoBoardProps) {
   const teamTiles = tiles.map((tile) => (teamIndex === 0 ? tile.team1 : tile.team2));
   const completeCount = teamTiles.filter((tile) => tile.is_complete).length;
+  const totalPossibleDrops = tiles.reduce(
+    (total, entry) => total + (entry.tile.type === "drop" ? entry.tile.required_drops ?? 0 : 0),
+    0,
+  );
+  const dropsLogged = tiles.reduce((total, entry) => {
+    if (entry.tile.type !== "drop") return total;
+
+    const requiredDrops = entry.tile.required_drops ?? 0;
+    const progress = teamIndex === 0 ? entry.team1 : entry.team2;
+    return total + (progress.pet_completed ? requiredDrops : Math.min(progress.current_drops, requiredDrops));
+  }, 0);
   const storageKey = `board-collapsed-${team.id}`;
 
   const [collapsed, setCollapsed] = useState(() => {
@@ -342,7 +353,9 @@ export default function BingoBoard({ tiles, team, teamIndex, petTileRules }: Bin
         <div className="flex flex-1 items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl">{team.name}</h2>
-            <p className="text-sm text-osrs-text-muted">{completeCount}/25 tiles complete</p>
+            <p className="text-sm text-osrs-text-muted">
+              {completeCount}/{tiles.length} tiles complete · {dropsLogged}/{totalPossibleDrops} drops logged
+            </p>
             {team.players.length > 0 && (
               <p className="mt-0.5 text-xs text-osrs-text-muted">
                 {team.players.map((p) => p.username).join(" · ")}
