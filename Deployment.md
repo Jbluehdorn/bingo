@@ -82,7 +82,9 @@ npm run db:migrate:remote
 npm run deploy
 ```
 
-This builds the app with the OpenNext Cloudflare adapter and deploys it to Cloudflare Workers. The URL will be printed at the end of the output.
+This first removes any stale OpenNext output, then builds the app with the OpenNext Cloudflare adapter and deploys it to Cloudflare Workers. The URL will be printed at the end of the output.
+
+On Windows, the deploy command retries removal of stale `.open-next` build output to tolerate temporary file locks. If cleanup still fails with `EPERM`, stop any running `next`, `wrangler`, or OpenNext processes using this project and run the command again. WSL remains the most reliable environment for OpenNext builds.
 
 ### Re-deploying after code changes
 
@@ -112,5 +114,5 @@ npm run db:migrate:remote
 | `npm run build` | Build the Next.js app (used internally by deploy) |
 | `npm run db:migrate:local` | Apply migrations to the local SQLite dev database |
 | `npm run db:migrate:remote` | Apply migrations to the live Cloudflare D1 database |
-| `npm run deploy` | Build and deploy to Cloudflare Pages |
+| `npm run deploy` | Clean, build, and deploy to Cloudflare Workers |
 | `npm run cf-typegen` | Regenerate TypeScript types for Cloudflare bindings |
